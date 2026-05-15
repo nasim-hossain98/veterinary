@@ -1,0 +1,70 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Vetenariy logo Vetenariy" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Vetenariy logo" [ref=e5]
+        - generic [ref=e12]: Vetenariy
+      - navigation [ref=e13]:
+        - link "Services" [ref=e14] [cursor=pointer]:
+          - /url: "#services"
+        - link "Find a Doctor" [ref=e15] [cursor=pointer]:
+          - /url: "#doctors"
+        - link "Pharmacy" [ref=e16] [cursor=pointer]:
+          - /url: "#pharmacy"
+        - link "Shop" [ref=e17] [cursor=pointer]:
+          - /url: "#shop"
+      - button "Emergency SOS" [ref=e18]: SOS
+  - main [ref=e24]:
+    - generic [ref=e25]:
+      - heading "Vetenariy" [level=1] [ref=e26]
+      - paragraph [ref=e27]: Smart Veterinary Care — Coming Soon
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - paragraph [ref=e31]: What We Offer
+        - heading "The Service Bento" [level=2] [ref=e32]
+        - paragraph [ref=e33]: Everything your companion needs, organized in one place.
+      - generic [ref=e34]:
+        - generic [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]:
+            - generic [ref=e39]:
+              - img [ref=e40]
+              - text: Always On
+            - img [ref=e43]
+          - generic [ref=e47]:
+            - generic [ref=e51]:
+              - img [ref=e53]
+              - generic [ref=e57]: Live
+            - heading "24/7 Telehealth" [level=3] [ref=e61]
+            - paragraph [ref=e62]: Connect with licensed veterinarians anytime, anywhere. Video consultations, prescription refills, and follow-ups — all from your device.
+        - generic [ref=e65] [cursor=pointer]:
+          - img [ref=e67]
+          - generic [ref=e74]:
+            - heading "Vaccination" [level=3] [ref=e75]
+            - paragraph [ref=e76]: Core & lifestyle vaccines tailored to your pet.
+            - link "Book Now" [ref=e77]:
+              - /url: "#"
+              - text: Book Now
+              - img [ref=e78]
+        - generic [ref=e82] [cursor=pointer]:
+          - img [ref=e84]
+          - generic [ref=e87]:
+            - heading "Surgery" [level=3] [ref=e88]
+            - paragraph [ref=e89]: State-of-the-art surgical suites with board-certified surgeons.
+        - generic [ref=e92] [cursor=pointer]:
+          - generic [ref=e93]:
+            - img [ref=e95]
+            - heading "Pet Wellness" [level=3] [ref=e98]
+            - paragraph [ref=e99]: Daily care tips, nutrition plans, and preventive routines to keep your companion thriving year-round.
+          - generic [ref=e100]:
+            - generic [ref=e101]:
+              - img [ref=e102]
+              - generic [ref=e105]: Balanced nutrition guides
+            - generic [ref=e106]:
+              - img [ref=e107]
+              - generic [ref=e110]: Preventive care schedules
+            - generic [ref=e111]:
+              - img [ref=e112]
+              - generic [ref=e115]: Exercise & enrichment plans
+  - button "Open Next.js Dev Tools" [ref=e121] [cursor=pointer]:
+    - img [ref=e122]

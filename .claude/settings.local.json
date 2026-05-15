@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc *)",
+      "Bash(npx next *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_playwright_playwright__browser_close",
+      "Bash(find src:*)",
+      "Bash(find node_modules/next/dist/docs -name *.md)",
+      "Bash(node:*)",
+      "Bash(xxd src/components/Hero.tsx)",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Read(//d/Me/Vetenariy project/Vetenary/landing-site/**)",
+      "Bash(done)"
+    ]
+  }
+}

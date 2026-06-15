@@ -91,6 +91,8 @@ const shops: Shop[] = [
   },
 ];
 
+/* ══════════════════════ MAIN COMPONENT ══════════════════════════ */
+
 export default function FindAndLocate() {
   const [activeTab, setActiveTab] = useState<TabType>("medical");
 
@@ -109,25 +111,26 @@ export default function FindAndLocate() {
             Location Services
           </p>
           <h2 className="mt-3 text-4xl font-semibold tracking-tight text-[#004D40] sm:text-5xl">
-            The &ldquo;Find & Locate&rdquo; Engine
+            The &ldquo;Find &amp; Locate&rdquo; Engine
           </h2>
           <p className="mt-4 max-w-xl text-lg leading-relaxed text-[#546E7A]">
-            Discover veterinary clinics and pet supply stores near you. Real-time availability, directions, and more.
+            Discover veterinary clinics and pet supply stores near you.
+            Real-time availability, directions, and more.
           </p>
         </motion.div>
 
         {/* Main Content */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
-          className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6"
-        >
-          {/* Sidebar Controls */}
+        <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
+          {/* ── Sidebar Controls ── */}
           <div className="space-y-6">
             {/* Toggle */}
-            <div className="rounded-2xl border border-[rgba(0,172,193,0.08)] bg-white p-2 shadow-[0_8px_32px_rgba(0,172,193,0.15)]">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="rounded-2xl border border-[rgba(0,172,193,0.08)] bg-white p-2 shadow-[0_8px_32px_rgba(0,172,193,0.15)]"
+            >
               <div className="relative flex rounded-xl bg-[#E0F7FA]/50 p-1">
                 <motion.div
                   className="absolute inset-y-1 rounded-lg bg-[#00ACC1]/15 border border-[#00ACC1]/30"
@@ -162,9 +165,9 @@ export default function FindAndLocate() {
                   Supplies
                 </button>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Cards List - Desktop Sidebar */}
+            {/* Clinic / Shop List — Desktop */}
             <div className="hidden lg:block space-y-4">
               <AnimatePresence mode="wait">
                 {activeTab === "medical" ? (
@@ -198,8 +201,14 @@ export default function FindAndLocate() {
             </div>
           </div>
 
-          {/* Map Area */}
-          <div className="relative min-h-[500px] lg:min-h-[600px] rounded-3xl border border-[rgba(0,172,193,0.08)] bg-white overflow-hidden shadow-[0_8px_32px_rgba(0,172,193,0.15)]">
+          {/* ── Map Area ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
+            className="relative min-h-[500px] lg:min-h-[600px] rounded-3xl border border-[rgba(0,172,193,0.08)] bg-white overflow-hidden shadow-[0_8px_32px_rgba(0,172,193,0.15)]"
+          >
             {/* Map Background Grid */}
             <div className="absolute inset-0 opacity-40">
               <div
@@ -219,19 +228,33 @@ export default function FindAndLocate() {
 
             {/* Map Markers */}
             <div className="absolute inset-0">
-              {activeTab === "medical" ? (
-                <>
-                  <MapMarker top="30%" left="25%" type="medical" label="Central Vet" />
-                  <MapMarker top="45%" left="55%" type="medical" label="PetCare" />
-                  <MapMarker top="65%" left="40%" type="medical" label="Wellness" />
-                </>
-              ) : (
-                <>
-                  <MapMarker top="35%" left="30%" type="supplies" label="Premium" />
-                  <MapMarker top="50%" left="60%" type="supplies" label="PetWorld" />
-                  <MapMarker top="70%" left="45%" type="supplies" label="Essentials" />
-                </>
-              )}
+              <AnimatePresence mode="wait">
+                {activeTab === "medical" ? (
+                  <motion.div
+                    key="medical-pins"
+                    className="absolute inset-0"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <MapMarker top="30%" left="25%" type="medical" label="Central Vet" delay={0} />
+                    <MapMarker top="45%" left="55%" type="medical" label="PetCare" delay={0.15} />
+                    <MapMarker top="65%" left="40%" type="medical" label="Wellness" delay={0.30} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="supply-pins"
+                    className="absolute inset-0"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <MapMarker top="35%" left="30%" type="supplies" label="Premium" delay={0} />
+                    <MapMarker top="50%" left="60%" type="supplies" label="PetWorld" delay={0.15} />
+                    <MapMarker top="70%" left="45%" type="supplies" label="Essentials" delay={0.30} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* User Location */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -275,10 +298,10 @@ export default function FindAndLocate() {
                 </div>
               </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
 
-        {/* Cards - Mobile Below Map */}
+        {/* Cards — Mobile Below Map */}
         <div className="mt-6 lg:hidden">
           <AnimatePresence mode="wait">
             {activeTab === "medical" ? (
@@ -315,13 +338,27 @@ export default function FindAndLocate() {
   );
 }
 
+/* ══════════════════════ CLINIC CARD ═══════════════════════════════ */
+
 function ClinicCard({ clinic, index }: { clinic: Clinic; index: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
-      className="group rounded-2xl border border-[rgba(0,172,193,0.08)] bg-white p-5 transition-all duration-300 hover:border-[#00ACC1]/30 hover:shadow-[0_8px_32px_rgba(0,172,193,0.18)]"
+      /* Slide in from left on scroll reveal */
+      initial={{ opacity: 0, x: -80 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{
+        duration: 0.55,
+        ease: [0.22, 1, 0.36, 1],
+        delay: index * 0.15,
+      }}
+      /* Lift + translate left on hover */
+      whileHover={{
+        x: -4,
+        boxShadow: "0 12px 40px rgba(0,172,193,0.18)",
+        transition: { duration: 0.2, ease: "easeOut" },
+      }}
+      className="group rounded-2xl border border-slate-100 bg-white p-5 transition-colors duration-300 hover:border-teal-200 cursor-pointer"
     >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
@@ -329,7 +366,9 @@ function ClinicCard({ clinic, index }: { clinic: Clinic; index: number }) {
             <Stethoscope className="h-5 w-5 text-[#FF8A80]" />
           </div>
           <div>
-            <h3 className="font-semibold text-[#004D40]">{clinic.name}</h3>
+            <h3 className="font-semibold text-slate-800 transition-colors duration-300 group-hover:text-teal-600">
+              {clinic.name}
+            </h3>
             <div className="flex items-center gap-2 mt-0.5">
               <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
               <span className="text-xs text-[#90A4AE]">{clinic.rating}</span>
@@ -374,13 +413,25 @@ function ClinicCard({ clinic, index }: { clinic: Clinic; index: number }) {
   );
 }
 
+/* ══════════════════════ SHOP CARD ═════════════════════════════════ */
+
 function ShopCard({ shop, index }: { shop: Shop; index: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
-      className="group rounded-2xl border border-[rgba(0,172,193,0.08)] bg-white p-5 transition-all duration-300 hover:border-[#4DD0E1]/30 hover:shadow-[0_8px_32px_rgba(77,208,225,0.18)]"
+      initial={{ opacity: 0, x: -80 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{
+        duration: 0.55,
+        ease: [0.22, 1, 0.36, 1],
+        delay: index * 0.15,
+      }}
+      whileHover={{
+        x: -4,
+        boxShadow: "0 12px 40px rgba(77,208,225,0.18)",
+        transition: { duration: 0.2, ease: "easeOut" },
+      }}
+      className="group rounded-2xl border border-slate-100 bg-white p-5 transition-colors duration-300 hover:border-teal-200 cursor-pointer"
     >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
@@ -388,7 +439,9 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
             <ShoppingBag className="h-5 w-5 text-[#4DD0E1]" />
           </div>
           <div>
-            <h3 className="font-semibold text-[#004D40]">{shop.name}</h3>
+            <h3 className="font-semibold text-slate-800 transition-colors duration-300 group-hover:text-teal-600">
+              {shop.name}
+            </h3>
             <div className="flex items-center gap-2 mt-0.5">
               <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
               <span className="text-xs text-[#90A4AE]">{shop.rating}</span>
@@ -426,42 +479,51 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
   );
 }
 
+/* ══════════════════════ MAP MARKER ════════════════════════════════ */
+
 function MapMarker({
   top,
   left,
   type,
   label,
+  delay = 0,
 }: {
   top: string;
   left: string;
   type: "medical" | "supplies";
   label: string;
+  delay?: number;
 }) {
   const isMedical = type === "medical";
+  const color = isMedical ? "#FF8A80" : "#4DD0E1";
 
   return (
     <motion.div
       className="absolute"
       style={{ top, left }}
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: "spring", duration: 0.6, delay: 0.3 }}
+      /* Pop in from scale 0 with bounce */
+      initial={{ scale: 0, opacity: 0, y: 10 }}
+      whileInView={{ scale: 1, opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{
+        type: "spring",
+        stiffness: 400,
+        damping: 18,
+        delay,
+      }}
+      whileHover={{ scale: 1.15, transition: { duration: 0.15 } }}
     >
-      <div className="relative -translate-x-1/2 -translate-y-1/2">
-        {/* Pulse ring */}
-        <div
-          className={`absolute -inset-3 animate-ping rounded-full opacity-30 ${
-            isMedical ? "bg-[#FF8A80]" : "bg-[#4DD0E1]"
-          }`}
-        />
+      <div className="relative -translate-x-1/2 -translate-y-1/2 cursor-pointer">
+        {/* ── Pulsing ring (alive state, repeats forever) ── */}
+        <PulseRing color={color} />
 
-        {/* Marker */}
+        {/* ── Marker body ── */}
         <div
-          className={`relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-white shadow-lg ${
-            isMedical
-              ? "bg-[#FF8A80] shadow-[#FF8A80]/30"
-              : "bg-[#4DD0E1] shadow-[#4DD0E1]/30"
-          }`}
+          className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white shadow-lg"
+          style={{
+            backgroundColor: color,
+            boxShadow: `0 4px 20px ${color}55`,
+          }}
         >
           {isMedical ? (
             <Stethoscope className="h-5 w-5 text-white" />
@@ -470,7 +532,7 @@ function MapMarker({
           )}
         </div>
 
-        {/* Label */}
+        {/* ── Label ── */}
         <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
           <span className="rounded-md bg-white/90 px-2 py-0.5 text-[10px] font-medium text-[#004D40] backdrop-blur-sm shadow-sm">
             {label}
@@ -478,5 +540,36 @@ function MapMarker({
         </div>
       </div>
     </motion.div>
+  );
+}
+
+/* ── Pulsing ring sub-component ── */
+function PulseRing({ color }: { color: string }) {
+  return (
+    <div className="absolute inset-0 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 pointer-events-none">
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          width: 40,
+          height: 40,
+          border: `2px solid ${color}`,
+          top: "50%",
+          left: "50%",
+          x: "-50%",
+          y: "-50%",
+        }}
+        initial={{ scale: 1, opacity: 0.6 }}
+        animate={{
+          scale: [1, 2.2],
+          opacity: [0.6, 0],
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeOut",
+          repeatDelay: 0.5,
+        }}
+      />
+    </div>
   );
 }

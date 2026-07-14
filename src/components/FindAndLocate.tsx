@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin,
@@ -91,7 +92,20 @@ const shops: Shop[] = [
   },
 ];
 
-/* ══════════════════════ MAIN COMPONENT ══════════════════════════ */
+/* ── Load the Leaflet map client-side only ─────────────────────────── */
+const LeafletMap = dynamic(() => import("./LeafletMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full min-h-[500px] lg:min-h-[600px] items-center justify-center rounded-3xl bg-[#E0F7FA]/40">
+      <div className="flex flex-col items-center gap-3 text-[#90A4AE]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#00ACC1]/30 border-t-[#00ACC1]" />
+        <span className="text-sm">Loading map…</span>
+      </div>
+    </div>
+  ),
+});
+
+/* ═══════════════════════ MAIN COMPONENT ══════════════════════════════ */
 
 export default function FindAndLocate() {
   const [activeTab, setActiveTab] = useState<TabType>("medical");
@@ -129,7 +143,12 @@ export default function FindAndLocate() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="rounded-2xl border border-[rgba(0,172,193,0.08)] bg-white p-2 shadow-[0_8px_32px_rgba(0,172,193,0.15)]"
+              className="rounded-2xl border border-[rgba(0,172,193,0.18)] p-2 shadow-[0_8px_32px_rgba(0,172,193,0.12)]"
+              style={{
+                background: "rgba(255,255,255,0.72)",
+                backdropFilter: "blur(22px)",
+                WebkitBackdropFilter: "blur(22px)",
+              }}
             >
               <div className="relative flex rounded-xl bg-[#E0F7FA]/50 p-1">
                 <motion.div
@@ -207,97 +226,13 @@ export default function FindAndLocate() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
-            className="relative min-h-[500px] lg:min-h-[600px] rounded-3xl border border-[rgba(0,172,193,0.08)] bg-white overflow-hidden shadow-[0_8px_32px_rgba(0,172,193,0.15)]"
+            className="relative min-h-[500px] lg:min-h-[600px] rounded-3xl overflow-hidden"
+            style={{
+              border: "1px solid rgba(0,172,193,0.18)",
+              boxShadow: "0 8px 40px rgba(0,172,193,0.12), 0 1px 0 rgba(255,255,255,0.9) inset",
+            }}
           >
-            {/* Map Background Grid */}
-            <div className="absolute inset-0 opacity-40">
-              <div
-                className="absolute inset-0"
-                style={{
-                  backgroundImage: `
-                    linear-gradient(rgba(0, 172, 193, 0.08) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0, 172, 193, 0.08) 1px, transparent 1px)
-                  `,
-                  backgroundSize: "40px 40px",
-                }}
-              />
-            </div>
-
-            {/* Map Glow */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,172,193,0.05),transparent_70%)]" />
-
-            {/* Map Markers */}
-            <div className="absolute inset-0">
-              <AnimatePresence mode="wait">
-                {activeTab === "medical" ? (
-                  <motion.div
-                    key="medical-pins"
-                    className="absolute inset-0"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <MapMarker top="30%" left="25%" type="medical" label="Central Vet" delay={0} />
-                    <MapMarker top="45%" left="55%" type="medical" label="PetCare" delay={0.15} />
-                    <MapMarker top="65%" left="40%" type="medical" label="Wellness" delay={0.30} />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="supply-pins"
-                    className="absolute inset-0"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <MapMarker top="35%" left="30%" type="supplies" label="Premium" delay={0} />
-                    <MapMarker top="50%" left="60%" type="supplies" label="PetWorld" delay={0.15} />
-                    <MapMarker top="70%" left="45%" type="supplies" label="Essentials" delay={0.30} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* User Location */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <div className="relative">
-                  <div className="absolute -inset-4 animate-ping rounded-full bg-[#00ACC1]/20" />
-                  <div className="relative flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-[#00ACC1] shadow-[0_0_20px_rgba(0,172,193,0.5)]">
-                    <div className="h-1.5 w-1.5 rounded-full bg-white" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Map Controls */}
-            <div className="absolute right-4 top-4 flex flex-col gap-2">
-              <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-[rgba(0,172,193,0.08)] bg-white/90 text-[#546E7A] backdrop-blur-sm transition-colors hover:text-[#004D40] shadow-sm">
-                <span className="text-lg font-medium">+</span>
-              </button>
-              <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-[rgba(0,172,193,0.08)] bg-white/90 text-[#546E7A] backdrop-blur-sm transition-colors hover:text-[#004D40] shadow-sm">
-                <span className="text-lg font-medium">−</span>
-              </button>
-            </div>
-
-            {/* Map Legend */}
-            <div className="absolute bottom-4 left-4 rounded-xl border border-[rgba(0,172,193,0.08)] bg-white/90 px-4 py-3 backdrop-blur-sm shadow-sm">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-3 w-3 items-center justify-center rounded-full bg-[#FF8A80]">
-                    <Stethoscope className="h-2 w-2 text-white" />
-                  </div>
-                  <span className="text-xs text-[#546E7A]">Clinic</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex h-3 w-3 items-center justify-center rounded-full bg-[#4DD0E1]">
-                    <ShoppingBag className="h-2 w-2 text-white" />
-                  </div>
-                  <span className="text-xs text-[#546E7A]">Shop</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full border-2 border-[#00ACC1] bg-[#00ACC1]/50" />
-                  <span className="text-xs text-[#546E7A]">You</span>
-                </div>
-              </div>
-            </div>
+            <LeafletMap activeTab={activeTab} />
           </motion.div>
         </div>
 
@@ -338,238 +273,180 @@ export default function FindAndLocate() {
   );
 }
 
-/* ══════════════════════ CLINIC CARD ═══════════════════════════════ */
+/* ═══════════════════════ GLASS CARD SHELL ══════════════════════════════
+   Matches ServiceBento's GlassCard exactly:
+   • rgba(255,255,255,0.72) frosted white base
+   • backdrop-blur-[22px]
+   • Hairline top-edge "glass rim" shine
+   • Subtle bottom-corner accent bloom on hover
+   • Lifts y:-8 on hover with bigger shadow
+═══════════════════════════════════════════════════════════════════════ */
+function GlassCard({
+  children,
+  accentRgb = "0,172,193",
+  className = "",
+  index = 0,
+}: {
+  children: React.ReactNode;
+  accentRgb?: string;
+  className?: string;
+  index?: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -60 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{
+        duration: 0.55,
+        ease: [0.22, 1, 0.36, 1],
+        delay: index * 0.12,
+      }}
+      whileHover={{
+        y: -6,
+        boxShadow: `0 20px 56px rgba(${accentRgb},0.20), 0 4px 16px rgba(${accentRgb},0.10), 0 1px 0 rgba(255,255,255,1) inset`,
+        border: `1px solid rgba(${accentRgb},0.35)`,
+        transition: { duration: 0.22, ease: "easeOut" },
+      } as Parameters<typeof motion.div>[0]["whileHover"]}
+      className={`group relative overflow-hidden rounded-2xl cursor-pointer ${className}`}
+      style={{
+        background: "rgba(255,255,255,0.72)",
+        backdropFilter: "blur(22px)",
+        WebkitBackdropFilter: "blur(22px)",
+        border: `1px solid rgba(${accentRgb},0.18)`,
+        boxShadow: `0 4px 24px rgba(${accentRgb},0.10), 0 1px 0 rgba(255,255,255,0.9) inset, 0 -1px 0 rgba(${accentRgb},0.06) inset`,
+      }}
+    >
+      {/* Glass rim — top edge highlight */}
+      <div
+        className="pointer-events-none absolute inset-x-4 top-0 h-px rounded-full"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(255,255,255,0.95), transparent)",
+        }}
+      />
+      {/* Hover accent bloom */}
+      <div
+        className="pointer-events-none absolute -bottom-8 -right-8 h-28 w-28 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(circle, rgba(${accentRgb},0.18) 0%, transparent 70%)`,
+          filter: "blur(16px)",
+        }}
+      />
+      {children}
+    </motion.div>
+  );
+}
+
+/* ═══════════════════════ CLINIC CARD ═══════════════════════════════════ */
 
 function ClinicCard({ clinic, index }: { clinic: Clinic; index: number }) {
   return (
-    <motion.div
-      /* Slide in from left on scroll reveal */
-      initial={{ opacity: 0, x: -80 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{
-        duration: 0.55,
-        ease: [0.22, 1, 0.36, 1],
-        delay: index * 0.15,
-      }}
-      /* Lift + translate left on hover */
-      whileHover={{
-        x: -4,
-        boxShadow: "0 12px 40px rgba(0,172,193,0.18)",
-        transition: { duration: 0.2, ease: "easeOut" },
-      }}
-      className="group rounded-2xl border border-slate-100 bg-white p-5 transition-colors duration-300 hover:border-teal-200 cursor-pointer"
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF8A80]/15 border border-[#FF8A80]/20">
-            <Stethoscope className="h-5 w-5 text-[#FF8A80]" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-slate-800 transition-colors duration-300 group-hover:text-teal-600">
-              {clinic.name}
-            </h3>
-            <div className="flex items-center gap-2 mt-0.5">
-              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-              <span className="text-xs text-[#90A4AE]">{clinic.rating}</span>
+    <GlassCard accentRgb="255,138,128" index={index}>
+      <div className="p-5">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF8A80]/15 border border-[#FF8A80]/25">
+              <Stethoscope className="h-5 w-5 text-[#FF8A80]" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-[#004D40] transition-colors duration-300 group-hover:text-[#00ACC1]">
+                {clinic.name}
+              </h3>
+              <div className="flex items-center gap-2 mt-0.5">
+                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                <span className="text-xs text-[#90A4AE]">{clinic.rating}</span>
+              </div>
             </div>
           </div>
+          <div className="flex items-center gap-1.5 rounded-full bg-[#E0F7FA] px-2.5 py-1">
+            <MapPin className="h-3 w-3 text-[#90A4AE]" />
+            <span className="text-xs text-[#546E7A]">{clinic.distance}</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1.5 rounded-full bg-[#E0F7FA] px-2.5 py-1">
-          <MapPin className="h-3 w-3 text-[#90A4AE]" />
-          <span className="text-xs text-[#546E7A]">{clinic.distance}</span>
+
+        <div className="mt-4 flex items-center gap-2">
+          <div
+            className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
+              clinic.isOpen
+                ? "bg-emerald-50 text-emerald-600"
+                : "bg-red-50 text-red-500"
+            }`}
+          >
+            <Clock className="h-3 w-3" />
+            {clinic.isOpen ? "Open Now" : "Closed"}
+          </div>
+        </div>
+
+        <p className="mt-3 text-sm text-[#90A4AE]">{clinic.address}</p>
+
+        <div className="mt-4 flex gap-3">
+          <a
+            href={`tel:${clinic.phone}`}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#00ACC1]/10 px-4 py-2.5 text-sm font-medium text-[#00ACC1] transition-colors hover:bg-[#00ACC1]/20"
+          >
+            <Phone className="h-4 w-4" />
+            Call
+          </a>
+          <button className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[rgba(0,172,193,0.15)] bg-white/60 px-4 py-2.5 text-sm font-medium text-[#546E7A] transition-colors hover:bg-[#E0F7FA] hover:text-[#004D40]">
+            <Navigation className="h-4 w-4" />
+            Directions
+          </button>
         </div>
       </div>
-
-      <div className="mt-4 flex items-center gap-2">
-        <div
-          className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
-            clinic.isOpen
-              ? "bg-emerald-50 text-emerald-600"
-              : "bg-red-50 text-red-500"
-          }`}
-        >
-          <Clock className="h-3 w-3" />
-          {clinic.isOpen ? "Open Now" : "Closed"}
-        </div>
-      </div>
-
-      <p className="mt-3 text-sm text-[#90A4AE]">{clinic.address}</p>
-
-      <div className="mt-4 flex gap-3">
-        <a
-          href={`tel:${clinic.phone}`}
-          className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#00ACC1]/10 px-4 py-2.5 text-sm font-medium text-[#00ACC1] transition-colors hover:bg-[#00ACC1]/20"
-        >
-          <Phone className="h-4 w-4" />
-          Call
-        </a>
-        <button className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[rgba(0,172,193,0.1)] bg-white px-4 py-2.5 text-sm font-medium text-[#546E7A] transition-colors hover:bg-[#E0F7FA] hover:text-[#004D40]">
-          <Navigation className="h-4 w-4" />
-          Directions
-        </button>
-      </div>
-    </motion.div>
+    </GlassCard>
   );
 }
 
-/* ══════════════════════ SHOP CARD ═════════════════════════════════ */
+/* ═══════════════════════ SHOP CARD ════════════════════════════════════ */
 
 function ShopCard({ shop, index }: { shop: Shop; index: number }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -80 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{
-        duration: 0.55,
-        ease: [0.22, 1, 0.36, 1],
-        delay: index * 0.15,
-      }}
-      whileHover={{
-        x: -4,
-        boxShadow: "0 12px 40px rgba(77,208,225,0.18)",
-        transition: { duration: 0.2, ease: "easeOut" },
-      }}
-      className="group rounded-2xl border border-slate-100 bg-white p-5 transition-colors duration-300 hover:border-teal-200 cursor-pointer"
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4DD0E1]/15 border border-[#4DD0E1]/20">
-            <ShoppingBag className="h-5 w-5 text-[#4DD0E1]" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-slate-800 transition-colors duration-300 group-hover:text-teal-600">
-              {shop.name}
-            </h3>
-            <div className="flex items-center gap-2 mt-0.5">
-              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-              <span className="text-xs text-[#90A4AE]">{shop.rating}</span>
+    <GlassCard accentRgb="77,208,225" index={index}>
+      <div className="p-5">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4DD0E1]/15 border border-[#4DD0E1]/25">
+              <ShoppingBag className="h-5 w-5 text-[#4DD0E1]" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-[#004D40] transition-colors duration-300 group-hover:text-[#00ACC1]">
+                {shop.name}
+              </h3>
+              <div className="flex items-center gap-2 mt-0.5">
+                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                <span className="text-xs text-[#90A4AE]">{shop.rating}</span>
+              </div>
             </div>
           </div>
+          <div className="flex items-center gap-1.5 rounded-full bg-[#E0F7FA] px-2.5 py-1">
+            <MapPin className="h-3 w-3 text-[#90A4AE]" />
+            <span className="text-xs text-[#546E7A]">{shop.distance}</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1.5 rounded-full bg-[#E0F7FA] px-2.5 py-1">
-          <MapPin className="h-3 w-3 text-[#90A4AE]" />
-          <span className="text-xs text-[#546E7A]">{shop.distance}</span>
+
+        <div className="mt-4">
+          <p className="text-xs text-[#90A4AE] mb-2">Available Brands</p>
+          <div className="flex flex-wrap gap-2">
+            {shop.brands.map((brand) => (
+              <span
+                key={brand}
+                className="rounded-full border border-[#4DD0E1]/20 bg-[#4DD0E1]/10 px-3 py-1 text-xs text-[#0097A7]"
+              >
+                {brand}
+              </span>
+            ))}
+          </div>
         </div>
+
+        <p className="mt-3 text-sm text-[#90A4AE]">{shop.address}</p>
+
+        <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#4DD0E1]/10 border border-[#4DD0E1]/15 px-4 py-2.5 text-sm font-medium text-[#0097A7] transition-colors hover:bg-[#4DD0E1]/20">
+          <Navigation className="h-4 w-4" />
+          Get Directions
+          <ChevronRight className="h-4 w-4" />
+        </button>
       </div>
-
-      <div className="mt-4">
-        <p className="text-xs text-[#90A4AE] mb-2">Available Brands</p>
-        <div className="flex flex-wrap gap-2">
-          {shop.brands.map((brand) => (
-            <span
-              key={brand}
-              className="rounded-full border border-[#4DD0E1]/20 bg-[#4DD0E1]/10 px-3 py-1 text-xs text-[#0097A7]"
-            >
-              {brand}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <p className="mt-3 text-sm text-[#90A4AE]">{shop.address}</p>
-
-      <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#4DD0E1]/10 px-4 py-2.5 text-sm font-medium text-[#0097A7] transition-colors hover:bg-[#4DD0E1]/20">
-        <Navigation className="h-4 w-4" />
-        Get Directions
-        <ChevronRight className="h-4 w-4" />
-      </button>
-    </motion.div>
-  );
-}
-
-/* ══════════════════════ MAP MARKER ════════════════════════════════ */
-
-function MapMarker({
-  top,
-  left,
-  type,
-  label,
-  delay = 0,
-}: {
-  top: string;
-  left: string;
-  type: "medical" | "supplies";
-  label: string;
-  delay?: number;
-}) {
-  const isMedical = type === "medical";
-  const color = isMedical ? "#FF8A80" : "#4DD0E1";
-
-  return (
-    <motion.div
-      className="absolute"
-      style={{ top, left }}
-      /* Pop in from scale 0 with bounce */
-      initial={{ scale: 0, opacity: 0, y: 10 }}
-      whileInView={{ scale: 1, opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{
-        type: "spring",
-        stiffness: 400,
-        damping: 18,
-        delay,
-      }}
-      whileHover={{ scale: 1.15, transition: { duration: 0.15 } }}
-    >
-      <div className="relative -translate-x-1/2 -translate-y-1/2 cursor-pointer">
-        {/* ── Pulsing ring (alive state, repeats forever) ── */}
-        <PulseRing color={color} />
-
-        {/* ── Marker body ── */}
-        <div
-          className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white shadow-lg"
-          style={{
-            backgroundColor: color,
-            boxShadow: `0 4px 20px ${color}55`,
-          }}
-        >
-          {isMedical ? (
-            <Stethoscope className="h-5 w-5 text-white" />
-          ) : (
-            <ShoppingBag className="h-5 w-5 text-white" />
-          )}
-        </div>
-
-        {/* ── Label ── */}
-        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
-          <span className="rounded-md bg-white/90 px-2 py-0.5 text-[10px] font-medium text-[#004D40] backdrop-blur-sm shadow-sm">
-            {label}
-          </span>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-/* ── Pulsing ring sub-component ── */
-function PulseRing({ color }: { color: string }) {
-  return (
-    <div className="absolute inset-0 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 pointer-events-none">
-      <motion.div
-        className="absolute rounded-full"
-        style={{
-          width: 40,
-          height: 40,
-          border: `2px solid ${color}`,
-          top: "50%",
-          left: "50%",
-          x: "-50%",
-          y: "-50%",
-        }}
-        initial={{ scale: 1, opacity: 0.6 }}
-        animate={{
-          scale: [1, 2.2],
-          opacity: [0.6, 0],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeOut",
-          repeatDelay: 0.5,
-        }}
-      />
-    </div>
+    </GlassCard>
   );
 }

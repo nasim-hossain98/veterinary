@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Search, Stethoscope, Syringe, Hospital, Scissors, Phone, Star } from "lucide-react";
 import Image from "next/image";
+import ImageReveal from "@/components/ui/ImageReveal";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -252,13 +253,24 @@ export default function Hero() {
             {/* Headline — word by word, each a separate ref */}
             <h1
               ref={titleRef}
-              className="mt-6 font-bold leading-[1.08] tracking-tight text-[#004D40]"
-              style={{ fontSize: "clamp(2.4rem, 5vw, 4rem)", perspective: "800px" }}
+              className="mt-6 font-bold leading-[1.08]"
+              style={{
+                fontSize: "clamp(2.4rem, 5vw, 4rem)",
+                perspective: "800px",
+                letterSpacing: "-0.03em",
+              }}
             >
               <span
                 ref={word1Ref}
                 className="inline-block"
-                style={{ display: "block" }}
+                style={{
+                  display: "block",
+                  background: "linear-gradient(135deg, #004D40 0%, #1A6B5A 50%, #2E7D6F 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  filter: "drop-shadow(0 2px 4px rgba(0,77,64,0.15))",
+                }}
               >
                 Your Pet&apos;s
               </span>
@@ -267,10 +279,11 @@ export default function Hero() {
                 className="inline-block"
                 style={{
                   display: "block",
-                  background: "linear-gradient(90deg,#00ACC1,#26C6DA)",
+                  background: "linear-gradient(90deg, #00ACC1 0%, #4DD0E1 50%, #00E5FF 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
+                  filter: "drop-shadow(0 3px 12px rgba(0,172,193,0.35))",
                 }}
               >
                 Health,
@@ -280,14 +293,29 @@ export default function Hero() {
                 className="inline-block"
                 style={{
                   display: "block",
-                  background: "linear-gradient(90deg,#00897B,#4DB6AC)",
+                  background: "linear-gradient(90deg, #00897B 0%, #00BFA5 50%, #69F0AE 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
+                  backgroundSize: "200% auto",
+                  animation: "shimmer 4s linear infinite",
+                  filter: "drop-shadow(0 3px 12px rgba(0,137,123,0.35))",
                 }}
               >
                 Reimagined
               </span>
+
+              {/* Decorative gradient accent line */}
+              <span
+                className="block mt-3 h-1.5 rounded-full"
+                style={{
+                  width: "clamp(80px, 15vw, 160px)",
+                  background: "linear-gradient(90deg, #00ACC1, #4DD0E1, #00BFA5, #69F0AE)",
+                  boxShadow: "0 0 20px rgba(0,172,193,0.35), 0 0 60px rgba(0,183,165,0.15)",
+                  animation: "glowPulse 3s ease-in-out infinite",
+                  transformOrigin: "left center",
+                }}
+              />
             </h1>
 
             {/* Subtitle */}
@@ -370,26 +398,14 @@ export default function Hero() {
               className="relative"
               style={{ perspective: "1200px" }}
             >
-              <div className="relative w-[280px] h-[320px] sm:w-[340px] sm:h-[390px] lg:w-[390px] lg:h-[440px] rounded-3xl overflow-hidden border border-white/50"
-                style={{ boxShadow: "0 24px 70px rgba(0,172,193,0.28), 0 6px 20px rgba(0,0,0,0.08)" }}
-              >
-                <Image
-                  src="/Beautiful cat.png"
-                  alt="Beautiful cat receiving veterinary care"
-                  fill
-                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, 390px"
-                  className="object-cover"
-                  priority
-                />
-                {/* subtle inner glow overlay */}
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "linear-gradient(180deg,transparent 55%,rgba(0,77,64,0.12) 100%)",
-                  }}
-                />
-              </div>
+              <ImageReveal
+                src="/Beautiful cat.png"
+                alt="Beautiful cat receiving veterinary care"
+                className="w-[400px] h-[450px] sm:w-[500px] sm:h-[560px] lg:w-[580px] lg:h-[650px]"
+                sizes="(max-width: 640px) 400px, (max-width: 1024px) 500px, 580px"
+                priority
+                disableEntrance
+              />
             </div>
 
             {/* 30% Off Badge */}
@@ -518,6 +534,14 @@ export default function Hero() {
         @keyframes emergencyPulse {
           0%, 100% { box-shadow: 0 4px 18px rgba(251,113,133,0.25); }
           50%       { box-shadow: 0 4px 24px rgba(251,113,133,0.55), 0 0 0 6px rgba(251,113,133,0.08); }
+        }
+        @keyframes shimmer {
+          0%   { background-position: 0% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes glowPulse {
+          0%, 100% { opacity: 0.6; transform: scaleX(1); }
+          50%      { opacity: 1;   transform: scaleX(1.08); }
         }
       `}</style>
     </section>

@@ -13,6 +13,8 @@ import {
   ChevronRight,
   Star,
 } from "lucide-react";
+import { useCardGlow } from "@/components/ui/useCardGlow";
+import SceneShell from "@/components/experience/SceneShell";
 
 type TabType = "medical" | "supplies";
 
@@ -111,8 +113,16 @@ export default function FindAndLocate() {
   const [activeTab, setActiveTab] = useState<TabType>("medical");
 
   return (
-    <section id="doctors" className="w-full px-6 py-28">
-      <div className="mx-auto max-w-7xl">
+    <SceneShell
+      id="doctors"
+      label="Care Network"
+      eyebrow="Scene 04"
+      tone="blue"
+      aliases={["clinic", "clinics"]}
+      intensity={0.9}
+      className="relative w-full px-6 py-28"
+    >
+      <div className="relative z-10 mx-auto max-w-7xl" data-depth="0.5">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -121,8 +131,8 @@ export default function FindAndLocate() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="mb-12"
         >
-          <p className="text-sm font-medium tracking-[0.2em] uppercase text-[#00ACC1]">
-            Location Services
+          <p className="flex items-center gap-2 text-sm font-medium tracking-[0.2em] uppercase text-[#00ACC1]">
+            Our Locations
           </p>
           <h2 className="mt-3 text-4xl font-semibold tracking-tight text-[#004D40] sm:text-5xl">
             The &ldquo;Find &amp; Locate&rdquo; Engine
@@ -143,12 +153,8 @@ export default function FindAndLocate() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="rounded-2xl border border-[rgba(0,172,193,0.18)] p-2 shadow-[0_8px_32px_rgba(0,172,193,0.12)]"
-              style={{
-                background: "rgba(255,255,255,0.72)",
-                backdropFilter: "blur(22px)",
-                WebkitBackdropFilter: "blur(22px)",
-              }}
+              className="glass-surface rounded-2xl p-2"
+              style={{ "--glass-tint": "0,172,193" } as React.CSSProperties}
             >
               <div className="relative flex rounded-xl bg-[#E0F7FA]/50 p-1">
                 <motion.div
@@ -226,13 +232,32 @@ export default function FindAndLocate() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
-            className="relative min-h-[500px] lg:min-h-[600px] rounded-3xl overflow-hidden"
-            style={{
-              border: "1px solid rgba(0,172,193,0.18)",
-              boxShadow: "0 8px 40px rgba(0,172,193,0.12), 0 1px 0 rgba(255,255,255,0.9) inset",
-            }}
+            className="relative min-h-[500px] overflow-hidden rounded-3xl lg:min-h-[600px]"
+            style={
+              {
+                border: "1px solid rgba(255,255,255,0.65)",
+                boxShadow:
+                  "0 50px 120px -60px rgba(0,77,64,0.65), 0 12px 40px -22px rgba(0,172,193,0.45), 0 1px 0 rgba(255,255,255,0.95) inset",
+              } as React.CSSProperties
+            }
           >
             <LeafletMap activeTab={activeTab} />
+            {/* Live status badge overlay */}
+            <div className="pointer-events-none absolute left-4 top-4 z-[1000]">
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.9 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="flex items-center gap-2 rounded-full border border-white/60 bg-white/85 px-3.5 py-2 shadow-[0_4px_20px_rgba(0,172,193,0.25)] backdrop-blur-md"
+              >
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00ACC1] opacity-60" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#00ACC1]" />
+                </span>
+                <span className="text-xs font-semibold text-[#004D40]">Live near you</span>
+              </motion.div>
+            </div>
           </motion.div>
         </div>
 
@@ -269,7 +294,7 @@ export default function FindAndLocate() {
           </AnimatePresence>
         </div>
       </div>
-    </section>
+    </SceneShell>
   );
 }
 
@@ -292,6 +317,7 @@ function GlassCard({
   className?: string;
   index?: number;
 }) {
+  const glow = useCardGlow({ accentRgb, maxTilt: 5 });
   return (
     <motion.div
       initial={{ opacity: 0, x: -60 }}
@@ -315,8 +341,16 @@ function GlassCard({
         WebkitBackdropFilter: "blur(22px)",
         border: `1px solid rgba(${accentRgb},0.18)`,
         boxShadow: `0 4px 24px rgba(${accentRgb},0.10), 0 1px 0 rgba(255,255,255,0.9) inset, 0 -1px 0 rgba(${accentRgb},0.06) inset`,
+        ...glow.tiltStyle,
       }}
+      {...glow.handlers}
     >
+      {/* Cursor-following spotlight glow */}
+      <motion.div className="pointer-events-none absolute inset-0" style={glow.spotlightStyle} />
+      {/* Shimmer sweep on hover */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+        <div className="absolute inset-y-0 left-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 -translate-x-full transition-all duration-700 ease-out group-hover:translate-x-[360%] group-hover:opacity-100" />
+      </div>
       {/* Glass rim — top edge highlight */}
       <div
         className="pointer-events-none absolute inset-x-4 top-0 h-px rounded-full"
@@ -383,13 +417,13 @@ function ClinicCard({ clinic, index }: { clinic: Clinic; index: number }) {
         <div className="mt-4 flex gap-3">
           <a
             href={`tel:${clinic.phone}`}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#00ACC1]/10 px-4 py-2.5 text-sm font-medium text-[#00ACC1] transition-colors hover:bg-[#00ACC1]/20"
+            className="group/btn flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#00ACC1]/10 px-4 py-2.5 text-sm font-medium text-[#00ACC1] transition-colors hover:bg-[#00ACC1]/20"
           >
-            <Phone className="h-4 w-4" />
+            <Phone className="h-4 w-4 transition-transform duration-200 group-hover/btn:-translate-y-0.5" />
             Call
           </a>
-          <button className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[rgba(0,172,193,0.15)] bg-white/60 px-4 py-2.5 text-sm font-medium text-[#546E7A] transition-colors hover:bg-[#E0F7FA] hover:text-[#004D40]">
-            <Navigation className="h-4 w-4" />
+          <button className="group/btn flex flex-1 items-center justify-center gap-2 rounded-xl border border-[rgba(0,172,193,0.15)] bg-white/60 px-4 py-2.5 text-sm font-medium text-[#546E7A] transition-colors hover:bg-[#E0F7FA] hover:text-[#004D40]">
+            <Navigation className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-0.5" />
             Directions
           </button>
         </div>
@@ -441,10 +475,10 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
 
         <p className="mt-3 text-sm text-[#90A4AE]">{shop.address}</p>
 
-        <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#4DD0E1]/10 border border-[#4DD0E1]/15 px-4 py-2.5 text-sm font-medium text-[#0097A7] transition-colors hover:bg-[#4DD0E1]/20">
-          <Navigation className="h-4 w-4" />
+        <button className="group/btn mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#4DD0E1]/10 border border-[#4DD0E1]/15 px-4 py-2.5 text-sm font-medium text-[#0097A7] transition-colors hover:bg-[#4DD0E1]/20">
+          <Navigation className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-0.5" />
           Get Directions
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
         </button>
       </div>
     </GlassCard>

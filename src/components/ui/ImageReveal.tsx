@@ -5,7 +5,6 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState,
 } from "react";
 import {
   motion,
@@ -16,6 +15,7 @@ import {
   useReducedMotion,
 } from "framer-motion";
 import Image from "next/image";
+import { useIsMobile as useSharedIsMobile } from "@/hooks/useMediaQuery";
 
 /* ─────────────────────────────────────────────
    Types
@@ -50,17 +50,10 @@ const MOBILE_BREAKPOINT = 768;
    Hooks — media query for mobile detection
    ───────────────────────────────────────────── */
 function useIsMobile(breakpoint = MOBILE_BREAKPOINT) {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${breakpoint}px)`);
-    setIsMobile(mql.matches);
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
-  }, [breakpoint]);
-
-  return isMobile;
+  /* Delegates to the shared, SSR-safe media-query hook so this component
+     does not keep a second copy of the same logic (and does not call
+     setState from inside an effect). */
+  return useSharedIsMobile(breakpoint);
 }
 
 /* ─────────────────────────────────────────────
@@ -96,9 +89,6 @@ export default function ImageReveal({
   const smoothY = useSpring(mouseY, SPRING_CONFIG);
   const smoothRadius = useSpring(rawRadius, RADIUS_SPRING);
 
-  /* ── Track hover state for radius animation ── */
-  const [isHovered, setIsHovered] = useState(false);
-
   /* ── Calculate container diagonal for max reveal radius ── */
   const getMaxRadius = useCallback(() => {
     if (!containerRef.current) return 300;
@@ -126,7 +116,6 @@ export default function ImageReveal({
       mouseY.set(e.clientY - rect.top);
       smoothX.jump(e.clientX - rect.left);
       smoothY.jump(e.clientY - rect.top);
-      setIsHovered(true);
       rawRadius.set(getMaxRadius());
     },
     [isMobile, prefersReducedMotion, mouseX, mouseY, smoothX, smoothY, rawRadius, getMaxRadius]
@@ -134,7 +123,6 @@ export default function ImageReveal({
 
   const handleMouseLeave = useCallback(() => {
     if (isMobile || prefersReducedMotion) return;
-    setIsHovered(false);
     rawRadius.set(0);
   }, [isMobile, prefersReducedMotion, rawRadius]);
 
@@ -148,12 +136,10 @@ export default function ImageReveal({
       smoothX.jump(width / 2);
       smoothY.jump(height / 2);
     }
-    setIsHovered(true);
     rawRadius.set(getMaxRadius());
   }, [prefersReducedMotion, mouseX, mouseY, smoothX, smoothY, rawRadius, getMaxRadius]);
 
   const handleBlur = useCallback(() => {
-    setIsHovered(false);
     rawRadius.set(0);
   }, [rawRadius]);
 

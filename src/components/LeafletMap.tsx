@@ -60,6 +60,37 @@ const shopLocations: MapMarkerData[] = [
 const userLocation = { lat: 51.513, lng: -0.092 };
 
 /* ═══════════════════════ COMPONENT ════════════════════════════════════ */
+/**
+ * Build the markers for a tab. Pure: it creates Leaflet layers and hands them
+ * back, so the caller (inside an effect) owns every mutation of the map and of
+ * the marker ref. Keeping it at module scope also keeps it out of the
+ * component's render scope.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createMarkers(L: any, tab: "medical" | "supplies") {
+  const locations = tab === "medical" ? clinicLocations : shopLocations;
+
+  return locations.map((loc) => {
+    const icon = L.divIcon({
+      html: buildMarkerSvg(loc.type),
+      iconSize: [42, 52],
+      iconAnchor: [21, 52],
+      popupAnchor: [0, -54],
+      className: "",
+    });
+
+    return L.marker([loc.lat, loc.lng], { icon }).bindPopup(
+      `<div style="font-family:inherit;min-width:120px;padding:2px 0">
+            <strong style="color:#004D40;font-size:13px">${loc.label}</strong>
+            <p style="margin:4px 0 0;font-size:11px;color:#546E7A">
+              ${tab === "medical" ? "Veterinary Clinic" : "Pet Supply Shop"}
+            </p>
+          </div>`,
+      { offset: [0, -50], closeButton: false }
+    );
+  });
+}
+
 export default function LeafletMap({ activeTab }: LeafletMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -109,7 +140,9 @@ export default function LeafletMap({ activeTab }: LeafletMapProps) {
         .addTo(map);
 
       // Draw initial tab markers
-      drawMarkers(L, map, activeTab);
+      const initialMarkers = createMarkers(L, activeTab);
+      initialMarkers.forEach((marker) => marker.addTo(map));
+      markersRef.current = initialMarkers;
     })();
 
     return () => {
@@ -129,43 +162,14 @@ export default function LeafletMap({ activeTab }: LeafletMapProps) {
     if (!mapRef.current) return;
     (async () => {
       const L = (await import("leaflet")).default;
-      if (mapRef.current) drawMarkers(L, mapRef.current, activeTab);
+      const map = mapRef.current;
+      if (!map) return;
+      markersRef.current.forEach((m) => m.remove());
+      const nextMarkers = createMarkers(L, activeTab);
+      nextMarkers.forEach((marker) => marker.addTo(map));
+      markersRef.current = nextMarkers;
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
-
-  /* ── Helper ───────────────────────────────────────────────────────── */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function drawMarkers(L: any, map: any, tab: "medical" | "supplies") {
-    markersRef.current.forEach((m) => m.remove());
-    markersRef.current = [];
-
-    const locations = tab === "medical" ? clinicLocations : shopLocations;
-
-    locations.forEach((loc) => {
-      const icon = L.divIcon({
-        html: buildMarkerSvg(loc.type),
-        iconSize: [42, 52],
-        iconAnchor: [21, 52],
-        popupAnchor: [0, -54],
-        className: "",
-      });
-
-      const marker = L.marker([loc.lat, loc.lng], { icon })
-        .bindPopup(
-          `<div style="font-family:inherit;min-width:120px;padding:2px 0">
-            <strong style="color:#004D40;font-size:13px">${loc.label}</strong>
-            <p style="margin:4px 0 0;font-size:11px;color:#546E7A">
-              ${tab === "medical" ? "Veterinary Clinic" : "Pet Supply Shop"}
-            </p>
-          </div>`,
-          { offset: [0, -50], closeButton: false }
-        )
-        .addTo(map);
-
-      markersRef.current.push(marker);
-    });
-  }
 
   return (
     <div className="relative w-full h-full min-h-[500px] lg:min-h-[600px]">

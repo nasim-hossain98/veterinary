@@ -19,6 +19,16 @@
   --service-cyan: #4DD0E1;
   --service-purple: #BA68C8;
   --accent-rose: #fb7185;
+
+  /* ══ 3D depth system (all values derived from the palette above) ══ */
+  --scene-perspective: 1500px;
+  --scene-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --scene-shadow-deep: 0 40px 120px -60px rgba(0, 77, 64, 0.55);
+  --scene-shadow-lift: 0 24px 70px -34px rgba(0, 172, 193, 0.45);
+  --scene-grid-line: rgba(0, 172, 193, 0.35);
+  --scene-glass: rgba(255, 255, 255, 0.72);
+  --scene-glass-strong: rgba(255, 255, 255, 0.86);
+  --scene-hairline: rgba(0, 172, 193, 0.16);
 }
 
 @theme inline {
@@ -57,4 +67,394 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ────────────────────────────────────────────────────────────
+   3D SCENE PRIMITIVES
+   Shared visual language for the scroll experience. Everything
+   is derived from the palette above, so the brand identity stays
+   recognisable while gaining depth.
+   ───────────────────────────────────────────────────────────── */
+
+/* Perspective host — every 3D scene is anchored around one of these */
+.scene-perspective {
+  perspective: var(--scene-perspective);
+  perspective-origin: 50% 45%;
+}
+
+/* Preserve 3D for nested layers (used sparingly: grouping props flatten 3D) */
+.scene-stage {
+  transform-style: preserve-3d;
+}
+
+/* Scroll-driven parallax layers are tagged with data-depth="0.2 … 1.6" */
+[data-depth] {
+  backface-visibility: hidden;
+}
+
+/* Faint receding grid used as a far "atmosphere" layer */
+.depth-grid {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      var(--scene-grid-line) 0,
+      var(--scene-grid-line) 1px,
+      transparent 1px,
+      transparent 64px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      var(--scene-grid-line) 0,
+      var(--scene-grid-line) 1px,
+      transparent 1px,
+      transparent 64px
+    );
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 35%, #000 0%, transparent 72%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 35%, #000 0%, transparent 72%);
+}
+
+/* Soft vignette darkening the corners → reads as a camera lens */
+.depth-vignette {
+  background: radial-gradient(
+    ellipse 120% 90% at 50% 45%,
+    transparent 40%,
+    rgba(0, 77, 64, 0.05) 78%,
+    rgba(0, 77, 64, 0.1) 100%
+  );
+}
+
+/* Glass shell shared by the scroll chrome (rail, bridge, cue, indicator) */
+.experience-glass {
+  background: var(--scene-glass);
+  backdrop-filter: blur(20px) saturate(130%);
+  -webkit-backdrop-filter: blur(20px) saturate(130%);
+  border: 1px solid var(--scene-hairline);
+  box-shadow:
+    0 8px 32px -12px rgba(0, 172, 193, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+/* Animated ambient decorations */
+.motion-optional {
+  will-change: transform, opacity;
+}
+
+@keyframes vd-float {
+  from { transform: translate3d(0, -6px, 0); }
+  to   { transform: translate3d(0, 6px, 0); }
+}
+@keyframes vd-cue {
+  0%   { transform: translateY(-7px); opacity: 0; }
+  30%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { transform: translateY(7px); opacity: 0; }
+}
+@keyframes vd-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(14px, -18px, 0) scale(1.06); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes vd-ring {
+  0%   { transform: scale(0.86); opacity: 0.5; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Static 3D tilts used by scene cards (disabled on small screens so text
+   never renders at an angle where it could look soft) */
+.scene-tilt-left {
+  transform: perspective(1100px) rotateY(6.5deg);
+}
+.scene-tilt-right {
+  transform: perspective(1100px) rotateY(-6.5deg);
+}
+.scene-lift {
+  box-shadow: var(--scene-shadow-deep);
+}
+@media (max-width: 1023px) {
+  .scene-tilt-left,
+  .scene-tilt-right {
+    transform: none;
+  }
+}
+
+/* Anchor offset so scene jumps clear the fixed header */
+[data-scene] {
+  scroll-margin-top: 92px;
+}
+
+/* Consistent, accessible focus ring for every interactive element */
+:focus-visible {
+  outline: 2px solid rgba(0, 172, 193, 0.7);
+  outline-offset: 3px;
+}
+
+/* ───────────────────────────────────────────────────────────
+   ACCESSIBILITY — reduced motion.
+   Content stays fully readable and the page fully navigable
+   without any scroll choreography or ambient motion.
+   ───────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .motion-optional,
+  [data-ambient="true"] {
+    animation: none !important;
+  }
+  [data-depth] {
+    transform: none !important;
+  }
+}
+
+/* Small screens: lighter grid density (fewer paint ops) */
+@media (max-width: 640px) {
+  .depth-grid {
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        var(--scene-grid-line) 0,
+        var(--scene-grid-line) 1px,
+        transparent 1px,
+        transparent 96px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        var(--scene-grid-line) 0,
+        var(--scene-grid-line) 1px,
+        transparent 1px,
+        transparent 96px
+      );
+  }
+}
+/* ══════════════════════════════════════════════════════════════
+   THE WORLD — one continuous aqua environment
+   ─────────────────────────────────────────────────────────────
+   Every scene floats inside this single space. No section swaps
+   its own background, so scrolling reads as travel through one
+   world instead of a stack of slides.
+
+   All tints are derived from the existing brand palette:
+     teal  #00ACC1 · cyan #4DD0E1 · navy #01579B · deep #004D40
+   ══════════════════════════════════════════════════════════════ */
+
+/* Fixed painter of the whole environment (behind every scene) */
+.world-shell {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 88% at 14% 2%, #F4FDFF 0%, transparent 56%),
+    radial-gradient(105% 74% at 88% 10%, #D7F4FA 0%, transparent 58%),
+    radial-gradient(150% 96% at 50% 106%, #AEE5F0 0%, transparent 72%),
+    linear-gradient(178deg, #EAFBFD 0%, #CBF1F7 44%, #E8F8FD 76%, #BCE9F3 100%);
+}
+
+/* ── Depth layers inside the world ──────────────────────────── */
+
+/* Soft colour reservoirs — the atmosphere the scenes travel through */
+.world-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(72px);
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* Out-of-focus glass shards drifting in front of the deep layers */
+.world-shard {
+  position: absolute;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  background: linear-gradient(
+    152deg,
+    rgba(255, 255, 255, 0.58) 0%,
+    rgba(255, 255, 255, 0.1) 60%,
+    rgba(255, 255, 255, 0.34) 100%
+  );
+  box-shadow: 0 26px 64px -36px rgba(0, 77, 64, 0.5);
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* Paw-print motif — barely there, but it makes the space feel owned */
+.world-paw {
+  position: absolute;
+  color: rgba(0, 172, 193, 0.42);
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Horizontal aqua wave bands (the reference's "liquid" horizon) */
+.world-waves {
+  position: absolute;
+  left: -50%;
+  width: 200%;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Camera-lens vignette so the world reads as a space, not a flat fill */
+.world-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 124% 92% at 50% 42%,
+    transparent 44%,
+    rgba(0, 77, 64, 0.045) 80%,
+    rgba(0, 77, 64, 0.09) 100%
+  );
+  pointer-events: none;
+}
+/* ══════════════════════════════════════════════════════════════
+   GLASSMORPHISM — one shared frosted surface
+   Cards read as "frosted glass floating inside a soft 3D
+   environment": translucent, softly bordered, gently lifted.
+   `--glass-tint` (r,g,b) lets each card borrow its palette accent.
+   ══════════════════════════════════════════════════════════════ */
+
+.glass-surface {
+  --glass-tint: 0, 172, 193;
+  position: relative;
+  background: linear-gradient(
+    152deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.6) 54%,
+    rgba(255, 255, 255, 0.78) 100%
+  );
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  box-shadow:
+    0 26px 72px -40px rgba(0, 77, 64, 0.5),
+    0 8px 22px -14px rgba(var(--glass-tint), 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.96) inset,
+    0 -1px 0 rgba(var(--glass-tint), 0.1) inset;
+}
+
+/* Tinted rim — picks up the card's accent along its lower edge */
+.glass-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 62%,
+    rgba(var(--glass-tint), 0.07) 100%
+  );
+}
+
+/* Hairline highlight along the top edge — the "glass rim" */
+.glass-rim {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  top: 0;
+  height: 1px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.95), transparent);
+  pointer-events: none;
+}
+
+/* Accent halo that blooms out of the lower corner on hover */
+.glass-bloom {
+  position: absolute;
+  right: -2rem;
+  bottom: -2rem;
+  width: 7rem;
+  height: 7rem;
+  border-radius: 9999px;
+  filter: blur(16px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(var(--glass-tint), 0.22) 0%, transparent 70%);
+}
+.group:hover .glass-bloom {
+  opacity: 1;
+}
+
+/* Small floating chip used for the reference's orbiting UI labels */
+.world-chip {
+  --glass-tint: 0, 172, 193;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.5rem 0.875rem;
+  background: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.68) 100%
+  );
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 16px 40px -26px rgba(0, 77, 64, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.95) inset;
+}
+/* ═════════════════════════════════════════════════════════════
+   SCENE TRANSITIONS — the "liquid curtain" between scenes
+   ═════════════════════════════════════════════════════════════ */
+
+.transition-curtain {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 172, 193, 0.16) 22%,
+    rgba(77, 208, 225, 0.3) 50%,
+    rgba(0, 172, 193, 0.16) 78%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(180deg, transparent, #000 45%, transparent);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 45%, transparent);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MICRO-INTERACTIONS
+   ═════════════════════════════════════════════════════════════ */
+
+/* Reveal-on-enter for headings: content is never hidden, only lifted */
+.text-lift {
+  will-change: transform, opacity;
+}
+
+@keyframes world-drift-x {
+  0%   { transform: translate3d(0, 0, 0); }
+  50%  { transform: translate3d(-4%, 1.5%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes world-drift-y {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(2%, -3%, 0) scale(1.05); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes world-shard {
+  0%   { transform: translate3d(0, -8px, 0) rotate(var(--shard-rot, 12deg)); }
+  100% { transform: translate3d(0, 10px, 0) rotate(calc(var(--shard-rot, 12deg) - 6deg)); }
+}
+@keyframes world-paw {
+  0%   { opacity: 0.18; transform: scale(0.96); }
+  50%  { opacity: 0.4;  transform: scale(1.04); }
+  100% { opacity: 0.18; transform: scale(0.96); }
+}
+@keyframes trail-dash {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Reduced motion: the world stays painted but perfectly still,
+   and every scroll choreography is neutralised. */
+@media (prefers-reduced-motion: reduce) {
+  .world-blob,
+  .world-shard,
+  .world-paw,
+  .world-waves {
+    animation: none !important;
+    transform: none !important;
+  }
+  .text-lift {
+    will-change: auto;
+  }
 }

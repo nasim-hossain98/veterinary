@@ -1,550 +1,395 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import {
-  Plus,
-  ShoppingCart,
-  Pill,
-  FlaskConical,
+  ArrowRight,
+  ArrowUpRight,
   Cookie,
-  Droplets,
-  Bone,
-  Check,
-  Info,
-  ChevronRight,
+  FlaskConical,
+  MessageCircle,
+  PawPrint,
+  Pill,
 } from "lucide-react";
+import SceneShell from "@/components/experience/SceneShell";
+import { useCardGlow } from "@/components/ui/useCardGlow";
 
-type Category = "all" | "prescription" | "vitamins" | "dry-food" | "wet-food" | "accessories";
+/* ────────────────────────────────────────────────────────────
+   Vet-Pharmacy — Scene 05.
 
-interface Product {
+   The shop as an open stage rather than a boxed card: the promise on
+   the left (eyebrow, headline, four product lanes, one action pair)
+   and a vet-grade still life resting on a lit podium on the right.
+   Both halves sit directly on the world backdrop — the ambient washes
+   float in the scene instead of being clipped by a panel — so the
+   section reads as part of the scroll story, not as a slide.
+   ───────────────────────────────────────────────────────────── */
+
+interface Shelf {
   id: string;
-  name: string;
-  brand: string;
-  price: number;
-  category: Category;
-  image: string;
-  badge?: string;
-  info: {
-    keyIngredients?: string[];
-    dosage?: string;
-    description?: string;
-  };
+  label: string;
+  from: string;
+  icon: React.ElementType;
+  /** Icon colour drawn from the palette. */
+  tint: string;
+  /** Soft wash sitting behind the icon tile. */
+  wash: string;
+  /** "r,g,b" accent driving the spotlight, tinted shadow and rim. */
+  glow: string;
 }
 
-const categories: { id: Category; label: string; icon: React.ElementType }[] = [
-  { id: "all", label: "All Products", icon: ShoppingCart },
-  { id: "prescription", label: "Prescription", icon: Pill },
-  { id: "vitamins", label: "Vitamins", icon: FlaskConical },
-  { id: "dry-food", label: "Dry Food", icon: Cookie },
-  { id: "wet-food", label: "Wet Food", icon: Droplets },
-  { id: "accessories", label: "Accessories", icon: Bone },
+/** The four product lanes that make up the shop. */
+const shelves: Shelf[] = [
+  {
+    id: "medications",
+    label: "Medications",
+    from: "$12.00",
+    icon: Pill,
+    tint: "#FF8A80",
+    wash: "rgba(255, 138, 128, 0.16)",
+    glow: "255,138,128",
+  },
+  {
+    id: "pet-food",
+    label: "Pet Food",
+    from: "$15.00",
+    icon: Cookie,
+    tint: "#4DD0E1",
+    wash: "rgba(77, 208, 225, 0.18)",
+    glow: "77,208,225",
+  },
+  {
+    id: "supplements",
+    label: "Supplements",
+    from: "$18.00",
+    icon: FlaskConical,
+    tint: "#FFB74D",
+    wash: "rgba(255, 183, 77, 0.18)",
+    glow: "255,183,77",
+  },
+  {
+    id: "grooming",
+    label: "Grooming",
+    from: "$10.00",
+    icon: PawPrint,
+    tint: "#BA68C8",
+    wash: "rgba(186, 104, 200, 0.18)",
+    glow: "186,104,200",
+  },
 ];
 
-const products: Product[] = [
-  {
-    id: "1",
-    name: "Hill's Prescription Diet",
-    brand: "Hill's",
-    price: 89.99,
-    category: "prescription",
-    image: "",
-    badge: "Rx Required",
-    info: {
-      keyIngredients: ["Chicken", "Brown Rice", "Omega Fatty Acids"],
-      dosage: "As prescribed by veterinarian",
-      description: "Clinical nutrition for kidney health support",
-    },
-  },
-  {
-    id: "2",
-    name: "PureVita Joint Support",
-    brand: "PureVita",
-    price: 34.99,
-    category: "vitamins",
-    image: "",
-    badge: "Best Seller",
-    info: {
-      keyIngredients: ["Glucosamine", "Chondroitin", "MSM", "Turmeric"],
-      dosage: "1 tablet per 25 lbs daily",
-      description: "Advanced joint mobility formula",
-    },
-  },
-  {
-    id: "3",
-    name: "Royal Canin Renal Support",
-    brand: "Royal Canin",
-    price: 76.5,
-    category: "dry-food",
-    image: "",
-    info: {
-      keyIngredients: ["Pork", "Chicken Fat", "Fish Oil", "Antioxidants"],
-      description: "Veterinary exclusive renal support diet",
-    },
-  },
-  {
-    id: "4",
-    name: "Pro Plan Veterinary Diets",
-    brand: "Purina",
-    price: 4.99,
-    category: "wet-food",
-    image: "",
-    badge: "New",
-    info: {
-      keyIngredients: ["Ocean Fish", "Liver", "Essential Vitamins"],
-      dosage: "1 can per 10 lbs body weight",
-      description: "Gastrointestinal health formula",
-    },
-  },
-  {
-    id: "5",
-    name: "Buffered Aspirin",
-    brand: "Nutri-Vet",
-    price: 12.99,
-    category: "prescription",
-    image: "",
-    badge: "Rx Required",
-    info: {
-      keyIngredients: ["Aspirin (120mg)", "Microcrystalline Cellulose"],
-      dosage: "5mg per lb every 12 hours",
-      description: "Pain relief for medium to large dogs",
-    },
-  },
-  {
-    id: "6",
-    name: "Probiotic Daily Chews",
-    brand: "Zesty Paws",
-    price: 28.99,
-    category: "vitamins",
-    image: "",
-    info: {
-      keyIngredients: ["DE111 Probiotic", "Pumpkin", "Papaya"],
-      dosage: "1 soft chew per 25 lbs",
-      description: "Digestive health and immune support",
-    },
-  },
-  {
-    id: "7",
-    name: "Orijen Original",
-    brand: "Orijen",
-    price: 94.99,
-    category: "dry-food",
-    image: "",
-    badge: "Premium",
-    info: {
-      keyIngredients: ["Free-Run Chicken", "Turkey", "Wild-Caught Fish", "Eggs"],
-      description: "Biologically appropriate whole prey diet",
-    },
-  },
-  {
-    id: "8",
-    name: "Blue Buffalo Wilderness",
-    brand: "Blue Buffalo",
-    price: 3.49,
-    category: "wet-food",
-    image: "",
-    info: {
-      keyIngredients: ["Real Duck", "Chicken Broth", "Potatoes", "Carrots"],
-      dosage: "Feed as meal or topper",
-      description: "High-protein grain-free paté",
-    },
-  },
-  {
-    id: "9",
-    name: "Adjustable Slow Feeder",
-    brand: "Outward Hound",
-    price: 24.99,
-    category: "accessories",
-    image: "",
-    info: {
-      description: "Maze design slows eating by 10x",
-    },
-  },
-  {
-    id: "10",
-    name: "Omega-3 Fish Oil",
-    brand: "Nordic Naturals",
-    price: 22.99,
-    category: "vitamins",
-    image: "",
-    badge: "Vet Recommended",
-    info: {
-      keyIngredients: ["Wild Anchovy Oil", "EPA", "DHA", "Vitamin E"],
-      dosage: "0.5 tsp per 20 lbs daily",
-      description: "Pharmaceutical-grade omega supplement",
-    },
-  },
-  {
-    id: "11",
-    name: "Hydrolyzed Protein",
-    brand: "Royal Canin",
-    price: 82.0,
-    category: "prescription",
-    image: "",
-    badge: "Rx Required",
-    info: {
-      keyIngredients: ["Hydrolyzed Soy Protein", "Coconut Oil", "B Vitamins"],
-      dosage: "As directed by veterinarian",
-      description: "For food sensitivities and allergies",
-    },
-  },
-  {
-    id: "12",
-    name: "Drinkwell Fountain",
-    brand: "PetSafe",
-    price: 49.99,
-    category: "accessories",
-    image: "",
-    badge: "Best Seller",
-    info: {
-      description: "Encourages hydration with filtered circulating water",
-    },
-  },
+/** Hero-style gradient used for the accent line and the primary action. */
+const ACCENT_LINE =
+  "linear-gradient(90deg, #00ACC1 0%, #4DD0E1 32%, #00BFA5 66%, #69F0AE 100%)";
+
+/** Leaves drifting around the still life (positions in % of the stage). */
+const leaves = [
+  { left: "2%", top: "14%", rotate: -24, size: 26, delay: 0.4 },
+  { left: "90%", top: "22%", rotate: 32, size: 20, delay: 1.1 },
+  { left: "80%", top: "64%", rotate: -14, size: 16, delay: 0.8 },
+  { left: "10%", top: "56%", rotate: 18, size: 14, delay: 1.4 },
+];
+
+/** Light motes catching the halo above the podium. */
+const motes = [
+  { left: "24%", top: "26%", size: 6 },
+  { left: "66%", top: "10%", size: 4 },
+  { left: "84%", top: "42%", size: 5 },
+  { left: "40%", top: "70%", size: 3 },
 ];
 
 export default function VetPharmacy() {
-  const [activeCategory, setActiveCategory] = useState<Category>("all");
-  const [cartCount, setCartCount] = useState(0);
-  const cartRef = useRef<HTMLDivElement>(null);
-
-  const filteredProducts =
-    activeCategory === "all"
-      ? products
-      : products.filter((p) => p.category === activeCategory);
+  const still = useReducedMotion() === true;
 
   return (
-    <section id="pharmacy" className="w-full px-6 py-28">
-      <div className="mx-auto max-w-7xl">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="mb-12 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end"
-        >
-          <div>
-            <p className="text-sm font-medium tracking-[0.2em] uppercase text-[#00ACC1]">
-              Shop Now
-            </p>
-            <h2 className="mt-3 text-4xl font-semibold tracking-tight text-[#004D40] sm:text-5xl">
-              Vet-Pharmacy & Nutrition
-            </h2>
-            <p className="mt-4 max-w-xl text-lg leading-relaxed text-[#546E7A]">
-              Premium veterinary-grade products and nutrition for your companion&apos;s optimal health.
-            </p>
+    <SceneShell
+      id="pharmacy"
+      label="Pharmacy"
+      eyebrow="Scene 05"
+      tone="coral"
+      aliases={["shop"]}
+      intensity={0.9}
+      className="px-6 py-28"
+    >
+      <div className="relative mx-auto max-w-7xl" data-depth="0.5">
+        <div className="relative grid grid-cols-1 items-center gap-14 lg:grid-cols-[1.04fr_0.96fr] lg:gap-12">
+          {/* ── LEFT · the promise ── */}
+          <div data-depth="0.58">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {/* Eyebrow chip with a live dot */}
+              <span className="inline-flex items-center gap-2.5 rounded-full border border-white/70 bg-white/65 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#00ACC1] shadow-[0_14px_34px_-26px_rgba(0,77,64,0.9)] backdrop-blur-sm">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00ACC1] opacity-75 motion-reduce:animate-none" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#00ACC1]" />
+                </span>
+                Our Products
+              </span>
+
+              <h2 className="mt-5 text-4xl font-bold leading-[1.08] tracking-tight text-[#004D40] sm:text-5xl lg:text-[3.4rem]">
+                Vet-Pharmacy &amp;{" "}
+                <span className="bg-gradient-to-r from-[#00ACC1] via-[#26C6DA] to-[#00BFA5] bg-clip-text text-transparent">
+                  Nutrition
+                </span>
+              </h2>
+
+              {/* Gradient accent — the same line the hero opens with */}
+              <span
+                aria-hidden="true"
+                className="mt-6 block h-[3px] w-28 rounded-full"
+                style={{ background: ACCENT_LINE }}
+              />
+
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#546E7A]">
+                Quality products for a healthier, happier life. From prescription
+                medications to premium pet food and supplements.
+              </p>
+            </motion.div>
+
+            {/* Product lanes */}
+            <div className="mt-10 grid grid-cols-2 gap-3.5 sm:grid-cols-4 sm:gap-4">
+              {shelves.map((shelf, index) => (
+                <ShelfCard
+                  key={shelf.id}
+                  shelf={shelf}
+                  index={index}
+                  still={still}
+                />
+              ))}
+            </div>
+
+            {/* Actions */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-11 flex flex-wrap items-center gap-3"
+            >
+              <Link
+                href="/shop"
+                className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full px-8 py-4 text-sm font-semibold text-white shadow-[0_24px_50px_-22px_rgba(0,172,193,1)] transition-all duration-300 hover:shadow-[0_30px_64px_-22px_rgba(0,172,193,1)]"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #00ACC1 0%, #0097A7 55%, #00897B 100%)",
+                }}
+              >
+                <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+                  <span className="absolute inset-y-0 left-0 w-1/3 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 transition-all duration-700 ease-out group-hover:translate-x-[360%] group-hover:opacity-100" />
+                </span>
+                Browse All Products
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 transition-transform duration-300 group-hover:translate-x-1">
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </Link>
+
+              <a
+                href="#contact"
+                className="group inline-flex items-center gap-2 rounded-full border border-[#00ACC1]/25 bg-white/65 px-6 py-4 text-sm font-semibold text-[#004D40] shadow-[0_18px_42px_-32px_rgba(0,77,64,0.9)] backdrop-blur-sm transition-all duration-300 hover:border-[#00ACC1]/50 hover:bg-white hover:text-[#00ACC1]"
+              >
+                <MessageCircle className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-12" />
+                Ask a Vet
+              </a>
+            </motion.div>
           </div>
 
-          {/* Cart Indicator */}
-          <motion.div
-            ref={cartRef}
-            className="flex items-center gap-3"
-            animate={cartCount > 0 ? { scale: [1, 1.1, 1] } : {}}
-            transition={{ duration: 0.3 }}
-            key={cartCount}
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#00ACC1]/10 border border-[#00ACC1]/20">
-              <ShoppingCart className="h-5 w-5 text-[#00ACC1]" />
-            </div>
-            <div>
-              <p className="text-xs text-[#90A4AE]">Cart</p>
-              <p className="text-lg font-semibold text-[#004D40]">
-                {cartCount} {cartCount === 1 ? "item" : "items"}
-              </p>
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* Category Pills */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-          className="mb-10 flex flex-wrap gap-3"
-        >
-          {categories.map((cat) => {
-            const Icon = cat.icon;
-            const isActive = activeCategory === cat.id;
-
-            return (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`group relative flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-300 ${
-                  isActive
-                    ? "bg-[#00ACC1] text-white shadow-lg shadow-[rgba(0,172,193,0.3)]"
-                    : "bg-white text-[#546E7A] border border-[rgba(0,172,193,0.08)] hover:bg-[#E0F7FA] hover:text-[#004D40]"
-                }`}
-              >
-                <Icon className={`h-4 w-4 transition-colors ${isActive ? "text-white" : "text-[#90A4AE]"}`} />
-                {cat.label}
-              </button>
-            );
-          })}
-        </motion.div>
-
-        {/* Product Grid */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCategory}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4 }}
-            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
-          >
-            {filteredProducts.map((product, index) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                index={index}
-                cartRef={cartRef}
-                onAddToCart={() => setCartCount((c) => c + 1)}
-              />
-            ))}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* View All CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-12 flex justify-center"
-        >
-          <button className="group flex items-center gap-2 rounded-full border border-[rgba(0,172,193,0.15)] bg-white px-8 py-3 text-sm font-medium text-[#546E7A] transition-all hover:border-[#00ACC1]/30 hover:bg-[#00ACC1]/10 hover:text-[#00ACC1] shadow-sm hover:shadow-md">
-            View All Products
-            <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </button>
-        </motion.div>
+          {/* ── RIGHT · the still life ── */}
+          <div data-depth="0.88" className="relative">
+            <ProductStage still={still} />
+          </div>
+        </div>
       </div>
-    </section>
+    </SceneShell>
   );
 }
 
-function ProductCard({
-  product,
+/* ─────────────────────────── left column ─────────────────────────── */
+
+/**
+ * ShelfCard — one product lane.
+ *
+ * Built on the shared `.glass-surface` primitive so it matches the bento
+ * and expert cards, then layered with the two interactions that make this
+ * section feel alive: a cursor-following spotlight (+ subtle 3D tilt) and
+ * a shimmer sweep on hover. The staggered offset lives on the outer
+ * wrapper so Framer's hover lift never overwrites the Tailwind translate.
+ */
+function ShelfCard({
+  shelf,
   index,
-  cartRef,
-  onAddToCart,
+  still,
 }: {
-  product: Product;
+  shelf: Shelf;
   index: number;
-  cartRef: React.RefObject<HTMLDivElement | null>;
-  onAddToCart: () => void;
+  still: boolean;
 }) {
-  const [added, setAdded] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const flyingItem = useAnimation();
-
-  const handleAddToCart = async () => {
-    if (!buttonRef.current || !cartRef.current) return;
-
-    const buttonRect = buttonRef.current.getBoundingClientRect();
-    const cartRect = cartRef.current.getBoundingClientRect();
-
-    const startX = buttonRect.left + buttonRect.width / 2;
-    const startY = buttonRect.top + buttonRect.height / 2;
-    const endX = cartRect.left + cartRect.width / 2;
-    const endY = cartRect.top + cartRect.height / 2;
-
-    await flyingItem.start({
-      x: [0, endX - startX],
-      y: [0, endY - startY],
-      scale: [1, 0.5, 0.3],
-      opacity: [1, 1, 0],
-      transition: {
-        duration: 0.6,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      },
-    });
-
-    flyingItem.set({ x: 0, y: 0, scale: 1, opacity: 0 });
-    onAddToCart();
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
-  };
+  const Icon = shelf.icon;
+  const glow = useCardGlow({
+    accentRgb: shelf.glow,
+    maxTilt: 6,
+    radius: 190,
+    intensity: 0.26,
+  });
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.08 }}
-      whileHover="hover"
-      className="group relative"
-    >
-      <div className="relative overflow-hidden rounded-2xl border border-[rgba(0,172,193,0.08)] bg-white transition-all duration-500 hover:border-[#00ACC1]/30 hover:shadow-[0_12px_40px_rgba(0,172,193,0.18)]">
-        {/* ── Product Image Area ── */}
-        <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-[#E0F7FA] to-[#B2EBF2]">
-          {/* Ambient glow */}
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center"
-            variants={{
-              hover: { scale: 1.15, opacity: 0.8 },
+    <div className={`h-full ${index % 2 === 1 ? "sm:-translate-y-3" : ""}`}>
+      <motion.a
+        href="/shop"
+        initial={{ opacity: 0, y: 26 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{
+          duration: 0.55,
+          delay: 0.1 + index * 0.08,
+          ease: [0.22, 1, 0.36, 1],
+        }}
+        whileHover={still ? undefined : { y: -8 }}
+        className="group glass-surface relative flex h-full w-full flex-col items-center overflow-hidden rounded-3xl px-3 py-6 text-center"
+        style={
+          { "--glass-tint": shelf.glow, ...glow.tiltStyle } as unknown as React.CSSProperties
+        }
+        {...glow.handlers}
+      >
+        {/* Cursor-following spotlight */}
+        <motion.span
+          className="pointer-events-none absolute inset-0"
+          style={glow.spotlightStyle}
+        />
+        {/* Shimmer sweep */}
+        <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+          <span className="absolute inset-y-0 left-0 w-1/3 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 transition-all duration-700 ease-out group-hover:translate-x-[360%] group-hover:opacity-100" />
+        </span>
+        <span className="glass-rim" />
+        <span className="glass-bloom" />
+
+        {/* Corner affordance */}
+        <span
+          aria-hidden="true"
+          className="absolute right-3 top-3 flex h-7 w-7 -translate-x-1 items-center justify-center rounded-full border border-white/70 bg-white/80 text-[#00ACC1] opacity-0 shadow-sm backdrop-blur-sm transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+        >
+          <ArrowUpRight className="h-3.5 w-3.5" />
+        </span>
+
+        <span
+          className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-white/70 shadow-[0_16px_30px_-20px_rgba(0,77,64,0.95)] transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-110"
+          style={{ background: shelf.wash }}
+        >
+          <Icon className="h-6 w-6" style={{ color: shelf.tint }} />
+        </span>
+
+        <span className="relative mt-4 text-[15px] font-semibold text-[#004D40]">
+          {shelf.label}
+        </span>
+        <span className="relative mt-2 rounded-full border border-[rgba(0,172,193,0.14)] bg-white/70 px-2.5 py-1 text-[11px] font-medium text-[#546E7A]">
+          {`From ${shelf.from}`}
+        </span>
+      </motion.a>
+    </div>
+  );
+}
+
+/* ─────────────────────────── right column ─────────────────────────── */
+
+/**
+ * ProductStage — the lit stage holding the product still life.
+ *
+ * The ambient set dressing (halo, rotating rings, drifting leaves, light
+ * motes) stays hand-drawn in CSS so it blends into the world backdrop,
+ * while the product group itself is now a photographic PNG
+ * (`/product-image.png`) that fades and rises in as the scene scrolls
+ * into view.
+ */
+function ProductStage({ still }: { still: boolean }) {
+  return (
+    <div className="relative mx-auto flex h-[360px] w-full max-w-[560px] items-end justify-center sm:h-[440px] lg:h-[520px]">
+      {/* Halo rising behind the shelf */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-[42%] h-[380px] w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.42) 46%, transparent 72%)",
+        }}
+      />
+
+      {/* Ring turning behind the podium */}
+      <motion.span
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-[46%] h-[330px] w-[330px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-[#00ACC1]/25 sm:h-[420px] sm:w-[420px]"
+        animate={still ? undefined : { rotate: 360 }}
+        transition={{ duration: 90, repeat: Infinity, ease: "linear" }}
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-[46%] h-[240px] w-[240px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/60 sm:h-[300px] sm:w-[300px]"
+      />
+
+      {/* Leaves drifting through the frame */}
+      {leaves.map((leaf, i) => (
+        <motion.span
+          key={`leaf-${i}`}
+          aria-hidden="true"
+          className="pointer-events-none absolute hidden md:block"
+          style={{ left: leaf.left, top: leaf.top }}
+          animate={still ? undefined : { y: [0, -14, 0] }}
+          transition={{
+            duration: 7 + i,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: leaf.delay,
+          }}
+        >
+          <span
+            className="block rounded-[50%_50%_50%_0] bg-gradient-to-br from-[#B7EFB0] to-[#45B45F] shadow-[0_10px_18px_-12px_rgba(0,77,64,0.7)]"
+            style={{
+              width: leaf.size,
+              height: leaf.size * 0.6,
+              transform: `rotate(${leaf.rotate}deg)`,
             }}
-            transition={{ duration: 0.5, ease: "circOut" }}
-          >
-            <div className="h-32 w-32 rounded-full bg-gradient-to-br from-[#00ACC1]/15 to-[#4DD0E1]/15 blur-2xl" />
-          </motion.div>
+          />
+        </motion.span>
+      ))}
 
-          {/* Product Icon */}
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center"
-            variants={{
-              hover: { scale: 1.1, filter: "brightness(0.9)" },
-            }}
-            transition={{ duration: 0.4, ease: "circOut" }}
-          >
-            <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-[rgba(0,172,193,0.12)] bg-white/80 backdrop-blur-sm shadow-sm">
-              {product.category === "prescription" && <Pill className="h-10 w-10 text-[#FF8A80]/70" />}
-              {product.category === "vitamins" && <FlaskConical className="h-10 w-10 text-amber-400/70" />}
-              {product.category === "dry-food" && <Cookie className="h-10 w-10 text-[#4DD0E1]/70" />}
-              {product.category === "wet-food" && <Droplets className="h-10 w-10 text-blue-400/70" />}
-              {product.category === "accessories" && <Bone className="h-10 w-10 text-[#BA68C8]/70" />}
-            </div>
-          </motion.div>
+      {/* Light motes catching the halo */}
+      {motes.map((mote, i) => (
+        <motion.span
+          key={`mote-${i}`}
+          aria-hidden="true"
+          className="pointer-events-none absolute rounded-full bg-white/90 shadow-[0_0_12px_2px_rgba(255,255,255,0.8)]"
+          style={{ left: mote.left, top: mote.top, width: mote.size, height: mote.size }}
+          animate={still ? undefined : { opacity: [0.25, 0.95, 0.25], scale: [0.85, 1.15, 0.85] }}
+          transition={{
+            duration: 5 + i * 0.6,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: i * 0.4,
+          }}
+        />
+      ))}
 
-          {/* Badge */}
-          {product.badge && (
-            <div className="absolute left-3 top-3 z-10">
-              <span
-                className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wider ${
-                  product.badge === "Rx Required"
-                    ? "bg-red-50 text-red-500 border border-red-200"
-                    : product.badge === "New"
-                    ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
-                    : product.badge === "Premium"
-                    ? "bg-amber-50 text-amber-600 border border-amber-200"
-                    : "bg-[#E0F7FA] text-[#00ACC1] border border-[rgba(0,172,193,0.2)]"
-                }`}
-              >
-                {product.badge}
-              </span>
-            </div>
-          )}
-
-          {/* ── Glassmorphism Lens Overlay ── */}
-          <motion.div
-            variants={{
-              hover: { opacity: 1, y: 0 },
-            }}
-            initial={{ opacity: 0, y: 30 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-            className="absolute inset-0 flex flex-col justify-end backdrop-blur-md bg-gradient-to-t from-white/95 via-white/70 to-transparent"
-          >
-            {/* Scan-line accent */}
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00ACC1]/40 to-transparent" />
-
-            <div className="p-5">
-              {/* Header */}
-              <div className="mb-3 flex items-center gap-2">
-                <Info className="h-3.5 w-3.5 text-[#00ACC1]" />
-                <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#00ACC1]">
-                  Quick Look
-                </span>
-              </div>
-
-              {/* Key Ingredients */}
-              {product.info.keyIngredients && (
-                <div className="mb-3">
-                  <p className="mb-1.5 text-[9px] uppercase tracking-[0.2em] text-[#90A4AE]">
-                    Key Ingredients
-                  </p>
-                  <div className="flex flex-wrap gap-1">
-                    {product.info.keyIngredients.map((ingredient) => (
-                      <span
-                        key={ingredient}
-                        className="rounded-full border border-[rgba(0,172,193,0.1)] bg-[#E0F7FA]/60 px-2 py-0.5 text-[9px] text-[#546E7A] backdrop-blur-sm"
-                      >
-                        {ingredient}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Dosage */}
-              {product.info.dosage && (
-                <div className="mb-3">
-                  <p className="mb-0.5 text-[9px] uppercase tracking-[0.2em] text-[#90A4AE]">
-                    Dosage
-                  </p>
-                  <p className="text-[11px] text-[#546E7A]">{product.info.dosage}</p>
-                </div>
-              )}
-
-              {/* Description */}
-              {product.info.description && (
-                <p className="mb-4 text-[10px] leading-relaxed text-[#90A4AE]">
-                  {product.info.description}
-                </p>
-              )}
-
-              {/* Quick Add button */}
-              <div className="relative">
-                <motion.button
-                  ref={buttonRef}
-                  onClick={handleAddToCart}
-                  disabled={added}
-                  whileTap={{ scale: 0.95 }}
-                  className={`flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-semibold transition-all duration-300 ${
-                    added
-                      ? "border border-emerald-300 bg-emerald-50 text-emerald-600"
-                      : "border border-[#00ACC1]/30 bg-[#00ACC1]/10 text-[#00ACC1] hover:bg-[#00ACC1]/20 hover:shadow-[0_0_15px_-3px_rgba(0,172,193,0.3)]"
-                  }`}
-                >
-                  <AnimatePresence mode="wait">
-                    {added ? (
-                      <motion.span
-                        key="done"
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.5 }}
-                        className="flex items-center gap-1.5"
-                      >
-                        <Check className="h-3.5 w-3.5" /> Added
-                      </motion.span>
-                    ) : (
-                      <motion.span
-                        key="add"
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.5 }}
-                        className="flex items-center gap-1.5"
-                      >
-                        <Plus className="h-3.5 w-3.5" /> Quick Add
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </motion.button>
-
-                {/* Flying item animation */}
-                <motion.div
-                  animate={flyingItem}
-                  initial={{ x: 0, y: 0, scale: 1, opacity: 0 }}
-                  className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#00ACC1] shadow-[0_0_15px_rgba(0,172,193,0.5)]">
-                    <Plus className="h-4 w-4 text-white" />
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Product Info */}
-        <div className="p-5">
-          <p className="mb-1 text-xs font-medium text-[#90A4AE]">{product.brand}</p>
-          <h3 className="mb-3 font-semibold text-[#004D40]">{product.name}</h3>
-
-          <div className="flex items-center justify-between">
-            <span className="text-xl font-bold text-[#00ACC1]">${product.price.toFixed(2)}</span>
-          </div>
-        </div>
-      </div>
-    </motion.div>
+      {/* The product still life — photographic PNG replacing the CSS shelf */}
+      <motion.div
+        initial={{ opacity: 0, y: 28, scale: 0.94 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, amount: 0.35 }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        className="relative z-10 w-[96%] max-w-[520px]"
+      >
+        <Image
+          src="/product-image.png"
+          alt="Vet-Pharmacy product range: a premium pet food bag, a bowl of kibble, a daily-vitamins bottle and a floating supplement box on a teal podium"
+          width={1349}
+          height={1166}
+          sizes="(min-width: 1024px) 520px, (min-width: 640px) 440px, 340px"
+          priority={false}
+          className="h-auto w-full drop-shadow-[0_36px_56px_rgba(0,77,64,0.35)]"
+        />
+      </motion.div>
+    </div>
   );
 }

@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
-import { EmergencyModal } from "./EmergencyModal";
+import { useActiveScene } from "@/hooks/useActiveScene";
+import { scenes } from "@/lib/scenes";
 
 const links = [
-  { label: "Services", href: "#services", icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" },
-  { label: "Find a Doctor", href: "#doctors", icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z" },
-  { label: "Pharmacy", href: "#pharmacy", icon: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" },
-  { label: "Shop", href: "#shop", icon: "M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" },
+  { label: "Services", href: "/#services", icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" },
+  { label: "Find a Doctor", href: "/#doctors", icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z" },
+  { label: "Pharmacy", href: "/pharmacy", icon: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" },
+  { label: "Shop", href: "/shop", icon: "M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" },
 ];
 
 function NavIcon({ path, className }: { path: string; className?: string }) {
@@ -66,10 +67,21 @@ function MenuToggle({ isOpen, toggle }: { isOpen: boolean; toggle: () => void })
 }
 
 export function GlassHeader() {
-  const [sosOpen, setSosOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { scrollY } = useScroll();
+  /* Scene-aware navigation: the link for the chapter on screen lights up */
+  const activeScene = useActiveScene();
+
+  /* Which nav entry matches the active scene (via scene aliases) */
+  const activeHref = (() => {
+    const scene = scenes.find((s) => s.id === activeScene);
+    if (!scene) return null;
+    if (scene.id === "services") return "/#services";
+    if (scene.id === "doctors") return "/#doctors";
+    if (scene.id === "pharmacy") return "/pharmacy";
+    return null;
+  })();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 20);
@@ -108,8 +120,8 @@ export function GlassHeader() {
           animate={{
             backgroundColor: scrolled ? "rgba(255,255,255,0.78)" : "rgba(255,255,255,0)",
             backdropFilter: scrolled ? "blur(20px) saturate(180%)" : "blur(0px) saturate(100%)",
-            WebkitBackdropFilter: scrolled ? "blur(20px) saturate(180%)" : "blur(0px) saturate(100%)",
           }}
+          style={{ WebkitBackdropFilter: scrolled ? "blur(20px) saturate(180%)" : "blur(0px) saturate(100%)" }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         />
 
@@ -135,7 +147,7 @@ export function GlassHeader() {
                   viewBox="0 0 36 36"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  aria-label="Vetenariy logo"
+                  aria-label="PawCare logo"
                 >
                   <ellipse cx="18" cy="22" rx="7" ry="6" fill="white" opacity="0.95" />
                   <ellipse cx="10" cy="14" rx="3.5" ry="4" fill="white" opacity="0.8" />
@@ -156,41 +168,62 @@ export function GlassHeader() {
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-bold tracking-tight text-[#004D40] leading-tight">
-                Vetenariy
+                PawCare
               </span>
               <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-[#00ACC1]/70 leading-none">
-                Smart Pet Care
+                Healthy Pets, Happy Lives
               </span>
             </div>
           </motion.a>
 
           {/* ─── Desktop Nav Links ─── */}
           <div className="hidden md:flex items-center gap-1">
-            {links.map((link) => (
-              <motion.a
-                key={link.href}
-                href={link.href}
-                className="group relative flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium text-[#546E7A] transition-colors hover:text-[#004D40]"
-                whileHover={{ y: -1 }}
-                whileTap={{ y: 0 }}
-              >
-                <NavIcon path={link.icon} className="opacity-0 group-hover:opacity-70 transition-opacity duration-300 text-[#00ACC1]" />
-                <span className="relative">
-                  {link.label}
-                  {/* Animated underline */}
-                  <span className="absolute -bottom-1 left-0 h-[2px] w-0 rounded-full bg-gradient-to-r from-[#00ACC1] to-[#4DD0E1] transition-all duration-300 group-hover:w-full" />
-                </span>
-                {/* Hover background pill */}
-                <span className="absolute inset-0 rounded-xl bg-[#00ACC1]/[0.04] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              </motion.a>
-            ))}
+            {links.map((link) => {
+              const isActive = link.href === activeHref;
+              return (
+                <motion.a
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? "true" : undefined}
+                  className={`group relative flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+                    isActive
+                      ? "text-[#00ACC1]"
+                      : "text-[#546E7A] hover:text-[#004D40]"
+                  }`}
+                  whileHover={{ y: -1 }}
+                  whileTap={{ y: 0 }}
+                >
+                  <NavIcon
+                    path={link.icon}
+                    className={`transition-opacity duration-300 text-[#00ACC1] ${
+                      isActive ? "opacity-70" : "opacity-0 group-hover:opacity-70"
+                    }`}
+                  />
+                  <span className="relative">
+                    {link.label}
+                    {/* Animated underline — persists while the scene is active */}
+                    <span
+                      className={`absolute -bottom-1 left-0 h-[2px] rounded-full bg-gradient-to-r from-[#00ACC1] to-[#4DD0E1] transition-all duration-300 ${
+                        isActive ? "w-full" : "w-0 group-hover:w-full"
+                      }`}
+                    />
+                  </span>
+                  {/* Hover background pill */}
+                  <span
+                    className={`absolute inset-0 rounded-xl bg-[#00ACC1]/[0.04] transition-opacity duration-300 ${
+                      isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                    }`}
+                  />
+                </motion.a>
+              );
+            })}
           </div>
 
           {/* ─── Right actions ─── */}
           <div className="flex items-center gap-3 z-10">
             {/* Book Appointment — desktop only */}
             <motion.a
-              href="#doctors"
+              href="/#doctors"
               className="hidden lg:flex items-center gap-2 rounded-full bg-gradient-to-r from-[#00ACC1] to-[#0097A7] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#00ACC1]/20 transition-shadow hover:shadow-xl hover:shadow-[#00ACC1]/30"
               whileHover={{ scale: 1.03, y: -1 }}
               whileTap={{ scale: 0.97 }}
@@ -203,23 +236,6 @@ export function GlassHeader() {
               </svg>
               Book Now
             </motion.a>
-
-            {/* SOS Button */}
-            <motion.button
-              onClick={() => setSosOpen(true)}
-              className="group relative flex h-10 items-center gap-2 rounded-full border border-red-200/60 bg-red-50/80 px-4 text-sm font-semibold text-red-500 backdrop-blur-sm transition-all hover:border-red-300 hover:bg-red-100/90"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Emergency SOS"
-            >
-              {/* Pulsing glow behind */}
-              <span className="absolute inset-0 rounded-full animate-pulse bg-red-500/5" />
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-60" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
-              </span>
-              <span className="relative">SOS</span>
-            </motion.button>
 
             {/* Mobile menu toggle */}
             <MenuToggle isOpen={mobileOpen} toggle={() => setMobileOpen(!mobileOpen)} />
@@ -275,7 +291,7 @@ export function GlassHeader() {
 
                 {/* Mobile CTA */}
                 <motion.a
-                  href="#doctors"
+                  href="/#doctors"
                   onClick={closeMobile}
                   className="mt-6 flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#00ACC1] to-[#0097A7] px-6 py-4 text-base font-semibold text-white shadow-lg shadow-[#00ACC1]/20"
                   initial={{ opacity: 0, y: 10 }}
@@ -294,7 +310,7 @@ export function GlassHeader() {
                 {/* Decorative bottom element */}
                 <div className="mt-6 flex items-center justify-center gap-2 text-xs text-[#90A4AE]">
                   <span className="h-[1px] w-8 bg-gradient-to-r from-transparent to-[#00ACC1]/30" />
-                  <span>Smart Veterinary Care</span>
+                  <span>Healthy Pets, Happy Lives</span>
                   <span className="h-[1px] w-8 bg-gradient-to-l from-transparent to-[#00ACC1]/30" />
                 </div>
               </div>
@@ -305,8 +321,6 @@ export function GlassHeader() {
 
       {/* ─── Spacer for fixed header ─── */}
       <div className="h-[72px]" />
-
-      <EmergencyModal open={sosOpen} onClose={() => setSosOpen(false)} />
     </>
   );
 }

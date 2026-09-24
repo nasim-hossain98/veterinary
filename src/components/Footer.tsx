@@ -5,9 +5,6 @@ import {
   Phone,
   MapPin,
   Mail,
-  ShieldCheck,
-  Award,
-  Stethoscope,
   ArrowUpRight,
   Send,
   Heart,
@@ -17,6 +14,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { PawHeartLogo } from "./PawHeartLogo";
+import SceneShell from "@/components/experience/SceneShell";
+import Magnetic from "@/components/ui/Magnetic";
 
 /* ───────────────── Data ───────────────── */
 
@@ -94,12 +93,6 @@ const footerLinks = [
   },
 ];
 
-const certifications = [
-  { icon: ShieldCheck, label: "Veterinary Council Approved" },
-  { icon: Award, label: "ISO 9001 Certified" },
-  { icon: Stethoscope, label: "AAHA Accredited" },
-];
-
 const legalLinks = [
   { label: "Privacy Policy", href: "#" },
   { label: "Terms of Service", href: "#" },
@@ -120,8 +113,17 @@ const fadeInUp = {
 export default function Footer() {
   return (
     <footer className="relative overflow-hidden">
-      {/* ── CTA Banner ── */}
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      {/* ══ Scene 08 — Start Care (CTA) ══ */}
+      <SceneShell
+        id="contact"
+        label="Start Care"
+        eyebrow="Scene 08"
+        tone="teal"
+        foreground={false}
+        intensity={0.8}
+        className="mx-auto max-w-7xl px-6 lg:px-8"
+      >
+        <div data-depth="0.55" className="relative">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -130,11 +132,23 @@ export default function Footer() {
           className="relative -mb-20 z-10 overflow-hidden rounded-3xl p-10 sm:p-14 border border-[rgba(0,172,193,0.12)]"
           style={{
             background: "linear-gradient(135deg, #E0F7FA 0%, #B2EBF2 50%, #E1F5FE 100%)",
+            boxShadow: "0 40px 120px -60px rgba(0,77,64,0.55)",
           }}
         >
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[#00ACC1]/10 blur-3xl" />
             <div className="absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-[#4DD0E1]/8 blur-3xl" />
+            {/* Depth rings — the story converging on this final step */}
+            <div
+              aria-hidden="true"
+              className="absolute right-10 top-1/2 hidden h-56 w-56 -translate-y-1/2 rounded-full border border-[rgba(0,172,193,0.18)] lg:block"
+              style={{ animation: "vd-ring 4.5s ease-out infinite" }}
+            />
+            <div
+              aria-hidden="true"
+              className="absolute right-10 top-1/2 hidden h-56 w-56 -translate-y-1/2 rounded-full border border-[rgba(0,172,193,0.12)] lg:block"
+              style={{ animation: "vd-ring 4.5s ease-out infinite", animationDelay: "-2.2s" }}
+            />
           </div>
           <div className="relative flex flex-col items-center gap-6 text-center sm:flex-row sm:text-left">
             <div className="flex-1">
@@ -142,20 +156,23 @@ export default function Footer() {
                 Ready to give your pet the best care?
               </h3>
               <p className="mt-3 max-w-md text-sm leading-relaxed text-[#546E7A]">
-                Join thousands of pet parents who trust Vetenariy for their companion&apos;s health and happiness.
+                Join thousands of pet parents who trust PawCare for their companion&apos;s health and happiness.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <a href="#services" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#00ACC1] px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[rgba(0,172,193,0.3)] transition-all hover:bg-[#0097A7] hover:-translate-y-0.5 hover:shadow-xl">
-                Get Started <ArrowUpRight className="h-4 w-4" />
-              </a>
+              <Magnetic strength={7}>
+                <a href="#services" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#00ACC1] px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[rgba(0,172,193,0.3)] transition-all hover:bg-[#0097A7] hover:-translate-y-0.5 hover:shadow-xl">
+                  Get Started <ArrowUpRight className="h-4 w-4" />
+                </a>
+              </Magnetic>
               <a href="tel:+18001234567" className="inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(0,172,193,0.2)] bg-white/70 backdrop-blur-sm px-7 py-3.5 text-sm font-semibold text-[#00ACC1] transition-all hover:bg-white hover:shadow-md">
                 <Phone className="h-4 w-4" /> Call Now
               </a>
             </div>
           </div>
         </motion.div>
-      </div>
+        </div>
+      </SceneShell>
 
       {/* ── Main Footer Body ── */}
       <div className="relative pt-32 pb-0">
@@ -220,10 +237,10 @@ export default function Footer() {
                 </div>
                 <div>
                   <span className="text-xl font-bold tracking-tight text-[#004D40]">
-                    Vetenariy
+                    PawCare
                   </span>
                   <p className="text-[10px] font-medium tracking-wider text-[#00ACC1]">
-                    SMART VET CARE
+                    HEALTHY PETS, HAPPY LIVES
                   </p>
                 </div>
               </div>
@@ -271,13 +288,13 @@ export default function Footer() {
 
                   <div className="my-4 h-px w-full bg-gradient-to-r from-transparent via-[rgba(0,172,193,0.12)] to-transparent" />
 
-                  <a href="mailto:care@vetenariy.ai" className="group flex items-center gap-3.5">
+                  <a href="mailto:care@pawcare.ai" className="group flex items-center gap-3.5">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-500 shadow-lg shadow-emerald-500/25">
                       <Mail className="h-4.5 w-4.5 text-white" />
                     </div>
                     <div>
                       <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#90A4AE]">Email</p>
-                      <p className="text-sm font-medium text-[#004D40]/80 transition-colors group-hover:text-emerald-600">care@vetenariy.ai</p>
+                      <p className="text-sm font-medium text-[#004D40]/80 transition-colors group-hover:text-emerald-600">care@pawcare.ai</p>
                     </div>
                   </a>
 
@@ -359,30 +376,6 @@ export default function Footer() {
                 </motion.div>
               </div>
 
-              {/* ── Certifications — Horizontal Cards ── */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-3"
-              >
-                {certifications.map((cert) => (
-                  <motion.div
-                    key={cert.label}
-                    whileHover={{ y: -2, boxShadow: "0 12px 32px rgba(0,172,193,0.12)" }}
-                    transition={{ type: "spring" as const, stiffness: 400, damping: 20 }}
-                    className="flex items-center gap-3 rounded-2xl bg-gradient-to-br from-[#F5FDFE] to-[#E0F7FA] p-4 ring-1 ring-[rgba(0,172,193,0.08)] shadow-sm"
-                  >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#00ACC1] to-[#0097A7] shadow-md shadow-[rgba(0,172,193,0.2)]">
-                      <cert.icon className="h-5 w-5 text-white" />
-                    </div>
-                    <span className="text-xs font-semibold text-[#004D40]">
-                      {cert.label}
-                    </span>
-                  </motion.div>
-                ))}
-              </motion.div>
             </div>
           </div>
 
@@ -410,7 +403,7 @@ export default function Footer() {
               </div>
 
               <p className="flex items-center gap-1.5 text-xs text-[#546E7A]">
-                &copy; {new Date().getFullYear()} Vetenariy. Made with
+                &copy; {new Date().getFullYear()} PawCare. Made with
                 <Heart className="h-3.5 w-3.5 fill-[#FF8A80] text-[#FF8A80] animate-pulse" />
                 for pets
               </p>

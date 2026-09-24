@@ -8,7 +8,7 @@ export function PawHeartLogo() {
       viewBox="0 0 36 36"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      aria-label="Vetenariy logo"
+      aria-label="PawCare logo"
     >
       {/* Main paw pad */}
       <ellipse cx="18" cy="22" rx="7" ry="6" fill="#00ACC1" opacity="0.9" />

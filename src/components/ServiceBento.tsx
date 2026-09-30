@@ -154,7 +154,7 @@ export default function ServiceBento() {
     >
       <div className="relative z-10 mx-auto max-w-6xl" data-depth="0.35">
         {/* ── Header: asymmetric, title left / intro right ── */}
-        <div className="mb-14 grid grid-cols-1 items-end gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="mb-14">
           <Reveal>
             <p className="flex items-center gap-2 text-sm font-medium uppercase tracking-[0.2em] text-[#00ACC1]">
               <span className="relative flex h-1.5 w-1.5">
@@ -167,11 +167,9 @@ export default function ServiceBento() {
               Our Services
             </p>
             <h2 className="mt-3 text-4xl font-semibold tracking-tight text-[#004D40] sm:text-5xl">
-              The Service Bento
+              The Services We Provide
             </h2>
-          </Reveal>
-          <Reveal delay={0.1} className="lg:pb-2">
-            <p className="max-w-md text-lg leading-relaxed text-[#546E7A]">
+            <p className="mt-4 max-w-md text-lg leading-relaxed text-[#546E7A]">
               Everything your companion needs, organized in one place.
             </p>
           </Reveal>

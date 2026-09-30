@@ -44,7 +44,7 @@ const shelves: Shelf[] = [
   {
     id: "medications",
     label: "Medications",
-    from: "$12.00",
+    from: "৳12.00",
     icon: Pill,
     tint: "#FF8A80",
     wash: "rgba(255, 138, 128, 0.16)",
@@ -53,7 +53,7 @@ const shelves: Shelf[] = [
   {
     id: "pet-food",
     label: "Pet Food",
-    from: "$15.00",
+    from: "৳15.00",
     icon: Cookie,
     tint: "#4DD0E1",
     wash: "rgba(77, 208, 225, 0.18)",
@@ -62,7 +62,7 @@ const shelves: Shelf[] = [
   {
     id: "supplements",
     label: "Supplements",
-    from: "$18.00",
+    from: "৳18.00",
     icon: FlaskConical,
     tint: "#FFB74D",
     wash: "rgba(255, 183, 77, 0.18)",
@@ -71,7 +71,7 @@ const shelves: Shelf[] = [
   {
     id: "grooming",
     label: "Grooming",
-    from: "$10.00",
+    from: "৳10.00",
     icon: PawPrint,
     tint: "#BA68C8",
     wash: "rgba(186, 104, 200, 0.18)",

@@ -304,7 +304,7 @@ function ProductCard({
 
           <div className="mt-4 flex items-center justify-between pt-1">
             <span className="text-lg font-bold text-[#004D40]">
-              ${product.price.toFixed(2)}
+              ৳{product.price.toFixed(2)}
             </span>
             <button
               type="button"

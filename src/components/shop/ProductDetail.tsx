@@ -169,7 +169,7 @@ export default function ProductDetail({ product }: { product: Product }) {
           {/* Price */}
           <div className="relative mt-6 flex items-end gap-3">
             <span className="text-4xl font-bold tracking-tight text-[#004D40]">
-              ${product.price.toFixed(2)}
+              ৳{product.price.toFixed(2)}
             </span>
             <span className="pb-1.5 text-sm text-[#90A4AE]">incl. taxes · per unit</span>
           </div>
@@ -233,7 +233,7 @@ export default function ProductDetail({ product }: { product: Product }) {
 
           {/* Trust badges */}
           <div className="relative mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <TrustBadge icon={<Truck className="h-4 w-4" />} label="Free delivery over $50" />
+            <TrustBadge icon={<Truck className="h-4 w-4" />} label="Free delivery over ৳50" />
             <TrustBadge icon={<RotateCcw className="h-4 w-4" />} label="30-day easy returns" />
             <TrustBadge icon={<ShieldCheck className="h-4 w-4" />} label="Vet approved" />
           </div>
@@ -471,7 +471,7 @@ function RelatedCard({ product, index }: { product: Product; index: number }) {
           </Link>
           <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-[#546E7A]">{product.blurb}</p>
           <div className="mt-auto flex items-center justify-between pt-4">
-            <span className="text-lg font-bold text-[#004D40]">${product.price.toFixed(2)}</span>
+            <span className="text-lg font-bold text-[#004D40]">৳{product.price.toFixed(2)}</span>
             <Link
               href={`/shop/${product.id}`}
               className="inline-flex items-center gap-1.5 rounded-full bg-[#00ACC1] px-4 py-2 text-xs font-semibold text-white shadow-[0_10px_24px_-12px_rgba(0,172,193,0.95)] transition-all hover:-translate-y-0.5 hover:bg-[#0097A7] active:scale-95"

@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+
 import { ArrowRight, CalendarCheck, ClipboardList, LifeBuoy, Stethoscope } from "lucide-react";
 import SceneShell from "@/components/experience/SceneShell";
 import GlassSurface, { type GlassTone } from "@/components/world/GlassSurface";
@@ -95,43 +94,22 @@ const TRAIL_PAWS = [
 ];
 
 /**
- * One milestone on the trail.
- *
- * Scroll position *within the item* drives its activation: whichever node is
- * nearest the middle of the viewport sits forward, larger, fully opaque and
- * lit; its neighbours stay visible but read as slightly farther away. That is
- * what turns four static cards into a walk down a path instead of a grid.
- *
- * Depth split: the GSAP parallax transform lives on the `<li>` (via
- * data-depth) while the activation transform lives on an inner wrapper, so
- * the two animation systems never write to the same element.
+ * One milestone on the trail, displayed without scroll-linked animation.
  */
 function StepItem({ step, index }: { step: JourneyStep; index: number }) {
-  const ref = useRef<HTMLLIElement>(null);
-  const reduce = useReducedMotion();
+
   const isLeft = index % 2 === 0;
   const Icon = step.icon;
 
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 90%", "end 25%"],
-  });
-
-  const scale = useTransform(scrollYProgress, [0, 0.45, 1], [0.93, 1.03, 0.92]);
-  const y = useTransform(scrollYProgress, [0, 0.5, 1], [26, -6, -30]);
-  const opacity = useTransform(scrollYProgress, [0, 0.28, 0.78, 1], [0.55, 1, 1, 0.6]);
-  const glow = useTransform(scrollYProgress, [0, 0.45, 1], [0, 1, 0]);
-  const nodeScale = useTransform(scrollYProgress, [0, 0.45, 1], [0.9, 1.14, 0.9]);
 
   return (
     <li
-      ref={ref}
-      data-depth={String(0.4 + index * 0.18)}
+
       className={`relative pl-16 lg:pl-0 ${isLeft ? "lg:pr-8" : "lg:mt-16 lg:pl-8"}`}
     >
       {/* ── Step node: on the mobile spine, card corner on desktop ── */}
       <span className="absolute left-[22px] top-9 z-20 -translate-x-1/2 lg:left-6 lg:top-6 lg:translate-x-0">
-        <motion.span style={reduce ? undefined : { scale: nodeScale }} className="block">
+        <span className="block">
           <span
             className="flex h-10 w-10 items-center justify-center rounded-full text-[11px] font-bold"
             style={{
@@ -142,20 +120,15 @@ function StepItem({ step, index }: { step: JourneyStep; index: number }) {
           >
             {step.index}
           </span>
-        </motion.span>
+        </span>
       </span>
 
-      {/* ── Activation wrapper (scroll-driven) ── */}
-      <motion.div
-        className="relative"
-        style={reduce ? undefined : { scale, y, opacity, willChange: "transform, opacity" }}
-      >
+      <div className="relative">
         {/* Accent aura that blooms when the step becomes active */}
-        <motion.span
+        <span
           aria-hidden="true"
-          className="pointer-events-none absolute -inset-5 rounded-[40px]"
+          className="pointer-events-none absolute -inset-5 rounded-[40px] opacity-50"
           style={{
-            opacity: reduce ? 0.5 : glow,
             background: `radial-gradient(ellipse at 30% 20%, rgba(${step.accentRgb},0.28), transparent 68%)`,
             filter: "blur(20px)",
           }}
@@ -205,7 +178,7 @@ function StepItem({ step, index }: { step: JourneyStep; index: number }) {
             </div>
           </div>
         </GlassSurface>
-      </motion.div>
+      </div>
     </li>
   );
 }
@@ -213,15 +186,9 @@ function StepItem({ step, index }: { step: JourneyStep; index: number }) {
 /**
  * Journey — Scene 03.
  *
- * The scroll narrative's "process" chapter: the platform's four real
- * capabilities laid out along one connecting route. A dotted path draws
- * itself as the visitor descends, paw prints mark the milestones, and each
- * step lights up as it reaches the middle of the viewport.
+ * The platform's four real capabilities, laid out along one connecting route.
  *
- * Responsive strategy: the route is rendered only where the two-column
- * geometry exists (≥1024px) so its scroll measurement is always meaningful.
- * Below that, the same story is told down a vertical spine, so the sequence
- * survives the narrower canvas instead of being scaled down.
+ * On smaller screens, the same story is told down a vertical spine.
  */
 export default function Journey() {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -231,13 +198,11 @@ export default function Journey() {
       id="journey"
       label="Journey"
       eyebrow="Scene 03"
-      tone="cyan"
-      intensity={1.05}
       className="w-full px-6 py-24"
     >
       <div className="relative mx-auto max-w-6xl">
         {/* ── Chapter header ── */}
-        <div data-depth="0.3">
+        <div>
           <Reveal className="max-w-2xl">
             <p className="flex items-center gap-2 text-sm font-medium uppercase tracking-[0.2em] text-[#00ACC1]">
               <span className="relative flex h-1.5 w-1.5">

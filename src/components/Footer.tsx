@@ -118,12 +118,10 @@ export default function Footer() {
         id="contact"
         label="Start Care"
         eyebrow="Scene 08"
-        tone="teal"
-        foreground={false}
-        intensity={0.8}
+
         className="mx-auto max-w-7xl px-6 lg:px-8"
       >
-        <div data-depth="0.55" className="relative">
+        <div className="relative">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -138,17 +136,7 @@ export default function Footer() {
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[#00ACC1]/10 blur-3xl" />
             <div className="absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-[#4DD0E1]/8 blur-3xl" />
-            {/* Depth rings — the story converging on this final step */}
-            <div
-              aria-hidden="true"
-              className="absolute right-10 top-1/2 hidden h-56 w-56 -translate-y-1/2 rounded-full border border-[rgba(0,172,193,0.18)] lg:block"
-              style={{ animation: "vd-ring 4.5s ease-out infinite" }}
-            />
-            <div
-              aria-hidden="true"
-              className="absolute right-10 top-1/2 hidden h-56 w-56 -translate-y-1/2 rounded-full border border-[rgba(0,172,193,0.12)] lg:block"
-              style={{ animation: "vd-ring 4.5s ease-out infinite", animationDelay: "-2.2s" }}
-            />
+
           </div>
           <div className="relative flex flex-col items-center gap-6 text-center sm:flex-row sm:text-left">
             <div className="flex-1">

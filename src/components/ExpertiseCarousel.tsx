@@ -58,11 +58,10 @@ export default function ExpertiseCarousel() {
       id="experts"
       label="Experts"
       eyebrow="Scene 06"
-      tone="violet"
-      intensity={0.85}
+
       className="relative w-full px-6 py-28"
     >
-      <div className="relative z-10 mx-auto max-w-7xl" data-depth="0.5">
+      <div className="relative z-10 mx-auto max-w-7xl">
         {/* ── Header: title left, "View All" right ── */}
         <motion.div
           initial={{ opacity:0, y:20 }}
@@ -126,7 +125,7 @@ export default function ExpertiseCarousel() {
 
           <div
             ref={scrollRef}
-            className="flex items-stretch gap-6 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory [perspective:1600px]"
+            className="flex items-stretch gap-6 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory"
             style={{ scrollbarWidth:"none", msOverflowStyle:"none" }}
           >
             <div className="shrink-0 w-0 lg:w-[calc((100vw-1280px)/2-24px)]" />
@@ -166,28 +165,17 @@ export default function ExpertiseCarousel() {
 }
 
 function DoctorCard({ doctor, index }: { doctor: Doctor; index: number }) {
-  const glow = useCardGlow({ accentRgb: "0,172,193", maxTilt: 4 });
-
-  /* Shallow 3D arc so the row reads as an arrangement floating in the world
-     rather than a flat filmstrip. Tilt is kept subtle on purpose. */
-  const arc = ((index % 3) - 1) * 3;
-  const rise = (1 - Math.abs(arc) / 3) * 14;
+  const glow = useCardGlow({ accentRgb: "0,172,193" });
 
   return (
-    <div
-      className="shrink-0 snap-start"
-      style={{
-        transform: `perspective(1600px) rotateY(${arc}deg) translateZ(${rise}px)`,
-        transformStyle: "preserve-3d",
-      }}
-    >
+    <div className="shrink-0 snap-start">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-40px" }}
         transition={{ duration: 0.5, delay: index * 0.08 }}
         whileHover={{ y: -8, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } }}
-        style={{ ...glow.tiltStyle }}
+
         {...glow.handlers}
         className="group relative h-full"
       >

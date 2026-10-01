@@ -107,15 +107,15 @@ export default function VetPharmacy() {
       id="pharmacy"
       label="Pharmacy"
       eyebrow="Scene 05"
-      tone="coral"
+
       aliases={["shop"]}
-      intensity={0.9}
+
       className="px-6 py-28"
     >
-      <div className="relative mx-auto max-w-7xl" data-depth="0.5">
+      <div className="relative mx-auto max-w-7xl">
         <div className="relative grid grid-cols-1 items-center gap-14 lg:grid-cols-[1.04fr_0.96fr] lg:gap-12">
           {/* ── LEFT · the promise ── */}
-          <div data-depth="0.58">
+          <div>
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -199,7 +199,7 @@ export default function VetPharmacy() {
           </div>
 
           {/* ── RIGHT · the still life ── */}
-          <div data-depth="0.88" className="relative">
+          <div className="relative">
             <ProductStage still={still} />
           </div>
         </div>
@@ -215,9 +215,9 @@ export default function VetPharmacy() {
  *
  * Built on the shared `.glass-surface` primitive so it matches the bento
  * and expert cards, then layered with the two interactions that make this
- * section feel alive: a cursor-following spotlight (+ subtle 3D tilt) and
- * a shimmer sweep on hover. The staggered offset lives on the outer
- * wrapper so Framer's hover lift never overwrites the Tailwind translate.
+ * section feel alive: a cursor-following spotlight and a shimmer sweep on
+ * hover. The staggered offset lives on the outer wrapper so Framer's hover
+ * lift never overwrites the Tailwind translate.
  */
 function ShelfCard({
   shelf,
@@ -231,7 +231,7 @@ function ShelfCard({
   const Icon = shelf.icon;
   const glow = useCardGlow({
     accentRgb: shelf.glow,
-    maxTilt: 6,
+
     radius: 190,
     intensity: 0.26,
   });
@@ -251,7 +251,7 @@ function ShelfCard({
         whileHover={still ? undefined : { y: -8 }}
         className="group glass-surface relative flex h-full w-full flex-col items-center overflow-hidden rounded-3xl px-3 py-6 text-center"
         style={
-          { "--glass-tint": shelf.glow, ...glow.tiltStyle } as unknown as React.CSSProperties
+          { "--glass-tint": shelf.glow } as React.CSSProperties
         }
         {...glow.handlers}
       >

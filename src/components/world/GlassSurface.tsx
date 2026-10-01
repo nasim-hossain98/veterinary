@@ -34,11 +34,7 @@ export interface GlassSurfaceProps {
   radius?: string;
   /** Padding utility, e.g. "p-7". */
   padding?: string;
-  /**
-   * Parallax depth for the scroll choreography
-   * (0.2 = far background … 1.6 = nearest foreground). Omit to opt out.
-   */
-  depth?: number;
+
   /** Hover lift in px — 0 keeps the card still. */
   lift?: number;
   /** Render as a different element (article/li keep list semantics). */
@@ -48,10 +44,8 @@ export interface GlassSurfaceProps {
 /**
  * GlassSurface — the one frosted card every scene is built from.
  *
- * "Frosted glass floating inside a soft 3D environment": translucent
- * gradient fill, backdrop blur, hairline rim, palette-tinted shadow and a
- * hover bloom. Keeping a single implementation is what makes eight very
- * different sections read as one coherent interface.
+ * A translucent gradient fill, backdrop blur, hairline rim, palette-tinted
+ * shadow and hover bloom keep the card style consistent across sections.
  *
  * Motion is intentionally plain (lift + inset shine) and automatically
  * neutralised for `prefers-reduced-motion` by the global MotionConfig, so
@@ -63,7 +57,7 @@ export default function GlassSurface({
   className = "",
   radius = "rounded-3xl",
   padding = "p-7",
-  depth,
+
   lift = 6,
   as,
 }: GlassSurfaceProps) {
@@ -86,15 +80,5 @@ export default function GlassSurface({
     </MotionTag>
   );
 
-  /* When the card participates in scroll parallax, the GSAP-driven transform
-     lives on an outer wrapper so it can never fight the Framer hover lift. */
-  if (depth === undefined) {
-    return <div className={`h-full ${className}`}>{card}</div>;
-  }
-
-  return (
-    <div data-depth={String(depth)} className={`h-full ${className}`}>
-      {card}
-    </div>
-  );
+  return <div className={`h-full ${className}`}>{card}</div>;
 }

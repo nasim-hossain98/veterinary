@@ -17,8 +17,7 @@ interface RevealProps {
   x?: number;
   /** Starting scale (1 keeps the element at its natural size). */
   scale?: number;
-  /** Starting Y rotation — a subtle "swing in from depth" cue. */
-  rotateY?: number;
+
   /** Portion of the element that must be visible before revealing. */
   amount?: number;
   /** Replay on every entry instead of only the first. */
@@ -41,18 +40,17 @@ export default function Reveal({
   y = 26,
   x = 0,
   scale = 1,
-  rotateY = 0,
+
   amount = 0.25,
   once = true,
 }: RevealProps) {
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y, x, scale, rotateY }}
-      whileInView={{ opacity: 1, y: 0, x: 0, scale: 1, rotateY: 0 }}
+      initial={{ opacity: 0, y, x, scale }}
+      whileInView={{ opacity: 1, y: 0, x: 0, scale: 1 }}
       viewport={{ once, amount }}
       transition={{ duration: 0.7, delay, ease: SCENE_EASE }}
-      style={rotateY !== 0 || scale !== 1 ? { transformPerspective: 1000 } : undefined}
     >
       {children}
     </motion.div>

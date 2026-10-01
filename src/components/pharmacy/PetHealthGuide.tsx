@@ -61,7 +61,7 @@ export default function PetHealthGuide() {
 
 function GuideCard({ guide, index }: { guide: PetGuide; index: number }) {
   const Icon = guide.icon;
-  const glow = useCardGlow({ accentRgb: guide.glow, maxTilt: 4, radius: 220, intensity: 0.2 });
+  const glow = useCardGlow({ accentRgb: guide.glow, radius: 220, intensity: 0.2 });
 
   return (
     <motion.div
@@ -73,7 +73,7 @@ function GuideCard({ guide, index }: { guide: PetGuide; index: number }) {
     >
       <div
         className="glass-surface relative flex h-full flex-col overflow-hidden rounded-[28px] p-6"
-        style={{ "--glass-tint": guide.glow, ...glow.tiltStyle } as unknown as React.CSSProperties}
+        style={{ "--glass-tint": guide.glow } as React.CSSProperties}
         {...glow.handlers}
       >
         <motion.span className="pointer-events-none absolute inset-0" style={glow.spotlightStyle} />

@@ -2,9 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 import Image from "next/image";
-import { motion } from "framer-motion";
+
 import {
   Activity,
   Award,
@@ -23,10 +23,7 @@ import SceneShell from "@/components/experience/SceneShell";
 import ScrollCue from "@/components/experience/ScrollCue";
 import FloatChip from "@/components/world/FloatChip";
 import { TONE_RGB, type GlassTone } from "@/components/world/GlassSurface";
-import { useCardGlow } from "@/components/ui/useCardGlow";
-import { prefersReducedMotion } from "@/lib/depthScene";
 
-gsap.registerPlugin(ScrollTrigger);
 
 /* ─── existing service icons (content unchanged) ─── */
 const serviceIcons = [
@@ -67,18 +64,13 @@ function animateCounter(el: HTMLElement, end: number, suffix: string, delay: num
  * Hero — Scene 01, and the entrance to the world.
  *
  * Composition follows the reference: a soft glass dome cradles the pet as the
- * single focal point, small UI chips orbit it at their own depths, and the
+ * single focal point, small UI chips orbit it, and the
  * copy/CTA/statistics stack asymmetrically to the left. The pet is a true
  * cut-out PNG, so it reads as an object *inside* the space rather than a
  * framed photograph.
  *
- * Depth: the whole stage is one scene (`SceneShell`), so every `data-depth`
- * child parallaxes through the world as you scroll. This component owns only
- * the one-off entrance choreography and the pet's idle breathing — scroll
- * movement is deliberately left to the scene system so nothing fights over
- * the same transform.
- *
- * Accessibility: `prefers-reduced-motion` skips the timeline entirely.
+ * The entrance animation and the pet's idle breathing are independent of
+ * page scrolling. `prefers-reduced-motion` skips the entrance timeline.
  * Because the timeline uses `gsap.from`, skipping it leaves the hero in its
  * final, fully-visible state.
  */
@@ -101,12 +93,10 @@ export default function Hero() {
   const emergencyRef = useRef<HTMLDivElement>(null);
   const discRef = useRef<HTMLDivElement>(null);
 
-  /* Gentle pointer tilt on the pet — disabled for touch + reduced motion. */
-  const petTilt = useCardGlow({ accentRgb: "0,172,193", maxTilt: 4, radius: 320, intensity: 0.14 });
 
   useEffect(() => {
     /* Reduced motion: render the final state, animate nothing. */
-    if (prefersReducedMotion()) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
@@ -118,16 +108,10 @@ export default function Hero() {
         scale: 0.5, opacity: 0, y: -22, duration: 0.55, ease: "back.out(2.4)",
       }, 0.2);
 
-      /* Headline slides up word by word, each out of its own depth plane */
-      tl.from(word1Ref.current, {
-        opacity: 0, y: 62, rotateX: 72, transformOrigin: "center bottom", duration: 1,
-      }, 0.4);
-      tl.from(word2Ref.current, {
-        opacity: 0, y: 62, rotateX: 72, transformOrigin: "center bottom", duration: 1,
-      }, 0.55);
-      tl.from(word3Ref.current, {
-        opacity: 0, y: 62, rotateX: 72, transformOrigin: "center bottom", duration: 1,
-      }, 0.7);
+      /* Headline slides up word by word. */
+      tl.from(word1Ref.current, { opacity: 0, y: 62, duration: 1 }, 0.4);
+      tl.from(word2Ref.current, { opacity: 0, y: 62, duration: 1 }, 0.55);
+      tl.from(word3Ref.current, { opacity: 0, y: 62, duration: 1 }, 0.7);
       tl.from(ruleRef.current, {
         scaleX: 0, opacity: 0, duration: 0.9, transformOrigin: "left center",
       }, 0.95);
@@ -176,9 +160,6 @@ export default function Hero() {
       id="home"
       label="Intro"
       eyebrow="Scene 01"
-      tone="teal"
-      intensity={0.7}
-      camera={1.6}
       sectionRef={sectionRef}
       className="w-full px-4 pt-2 pb-16 sm:px-6 lg:px-8"
     >
@@ -195,7 +176,7 @@ export default function Hero() {
         {/* Horizon arc — the reference's soft ground line */}
         <div
           aria-hidden="true"
-          data-depth="0.24"
+
           className="pointer-events-none absolute inset-x-[-6%] bottom-[4%] h-[240px] rounded-[50%]"
           style={{
             background:
@@ -205,7 +186,7 @@ export default function Hero() {
 
         <div className="relative grid grid-cols-1 items-center gap-12 px-4 pt-8 lg:min-h-[780px] lg:grid-cols-[1.04fr_0.96fr] lg:gap-6 lg:px-8 lg:pt-4">
           {/* ══════════ LEFT · copy, actions, numbers ══════════ */}
-          <div data-depth="0.4" className="relative z-10 flex flex-col items-start">
+          <div className="relative z-10 flex flex-col items-start">
             <div ref={badgeRef}>
               <span className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/70 px-4 py-1.5 text-xs font-semibold tracking-wide text-[#00ACC1] shadow-[0_12px_34px_-20px_rgba(0,77,64,0.6)] backdrop-blur-sm">
                 <Stethoscope className="h-3.5 w-3.5" />
@@ -217,7 +198,7 @@ export default function Hero() {
               className="mt-6 font-bold leading-[1.06]"
               style={{
                 fontSize: "clamp(2.45rem, 5.4vw, 4.4rem)",
-                perspective: "800px",
+
                 letterSpacing: "-0.03em",
               }}
             >
@@ -335,7 +316,7 @@ export default function Hero() {
                 return (
                   <div
                     key={stat.label}
-                    data-depth={String(0.5 + i * 0.15)}
+
                     className="glass-surface flex flex-col gap-1 rounded-2xl px-4 py-3.5"
                     style={{ "--glass-tint": rgb } as React.CSSProperties}
                   >
@@ -358,8 +339,8 @@ export default function Hero() {
           </div>
 
           {/* ══════════ RIGHT · the pet, held in a glass dome ══════════ */}
-          <div data-depth="0.72" className="relative z-10 flex items-center justify-center">
-            <div className="relative" style={{ perspective: "1400px" }}>
+          <div className="relative z-10 flex items-center justify-center">
+            <div className="relative">
               {/* ── Glass dome: the pet's world ── */}
               <div
                 ref={domeRef}
@@ -405,9 +386,8 @@ export default function Hero() {
               />
 
               {/* ── The pet ── */}
-              <div ref={catRef} className="relative z-10" {...petTilt.handlers}>
-                <motion.div style={petTilt.tiltStyle} className="relative">
-                  <Image
+              <div ref={catRef} className="relative z-10">
+                <Image
                     src="/hero-cat.png"
                     alt="A cat receiving veterinary care"
                     width={798}
@@ -415,18 +395,16 @@ export default function Hero() {
                     priority
                     sizes="(max-width: 640px) 260px, (max-width: 1024px) 340px, 430px"
                     className="h-auto w-[260px] select-none object-contain drop-shadow-[0_46px_60px_rgba(0,77,64,0.38)] sm:w-[340px] lg:w-[430px]"
-                  />
-                </motion.div>
+                />
               </div>
 
-              {/* ── Orbiting UI chips (their own depth layer) ── */}
+              {/* ── Orbiting UI chips ── */}
               <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20">
                 <FloatChip
                   icon={Heart}
                   label="Healthy Pets"
                   detail="Happy Lives"
                   tone="teal"
-                  depth={1.15}
                   delay={1.95}
                   className="absolute right-[-1rem] top-[30%] sm:right-[-2.5rem]"
                 />
@@ -435,7 +413,6 @@ export default function Hero() {
                   label="Live Vitals"
                   detail="Monitored"
                   tone="cyan"
-                  depth={1.3}
                   delay={2.1}
                   className="absolute left-[-1.5rem] top-[15%] sm:left-[-3.5rem]"
                 />
@@ -444,7 +421,6 @@ export default function Hero() {
                   label="Grooming"
                   detail="In-clinic"
                   tone="violet"
-                  depth={1.2}
                   delay={2.25}
                   className="absolute bottom-[22%] left-[-0.75rem] hidden sm:block sm:left-[-4rem]"
                 />
@@ -453,7 +429,6 @@ export default function Hero() {
                   label="Vaccinated"
                   detail="Up to date"
                   tone="coral"
-                  depth={1.35}
                   delay={2.4}
                   className="absolute bottom-[34%] right-[-0.5rem] hidden sm:block sm:right-[-3rem]"
                 />
@@ -551,7 +526,7 @@ export default function Hero() {
         </div>
 
         {/* ── Scroll cue — the invitation into the world ── */}
-        <div data-depth="0.5" className="mt-2 flex justify-center lg:mt-0">
+        <div className="mt-2 flex justify-center lg:mt-0">
           <ScrollCue href="#services" />
         </div>
 

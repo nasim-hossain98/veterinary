@@ -117,12 +117,12 @@ export default function FindAndLocate() {
       id="doctors"
       label="Care Network"
       eyebrow="Scene 04"
-      tone="blue"
+
       aliases={["clinic", "clinics"]}
-      intensity={0.9}
+
       className="relative w-full px-6 py-28"
     >
-      <div className="relative z-10 mx-auto max-w-7xl" data-depth="0.5">
+      <div className="relative z-10 mx-auto max-w-7xl">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -317,7 +317,7 @@ function GlassCard({
   className?: string;
   index?: number;
 }) {
-  const glow = useCardGlow({ accentRgb, maxTilt: 5 });
+  const glow = useCardGlow({ accentRgb });
   return (
     <motion.div
       initial={{ opacity: 0, x: -60 }}
@@ -341,7 +341,7 @@ function GlassCard({
         WebkitBackdropFilter: "blur(22px)",
         border: `1px solid rgba(${accentRgb},0.18)`,
         boxShadow: `0 4px 24px rgba(${accentRgb},0.10), 0 1px 0 rgba(255,255,255,0.9) inset, 0 -1px 0 rgba(${accentRgb},0.06) inset`,
-        ...glow.tiltStyle,
+
       }}
       {...glow.handlers}
     >

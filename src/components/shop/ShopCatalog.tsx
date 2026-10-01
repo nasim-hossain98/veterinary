@@ -244,7 +244,7 @@ function ProductCard({
 }) {
   const category = getCategory(product.category);
   const Icon = category.icon;
-  const glow = useCardGlow({ accentRgb: category.glow, maxTilt: 5, radius: 200, intensity: 0.24 });
+  const glow = useCardGlow({ accentRgb: category.glow, radius: 200, intensity: 0.24 });
 
   return (
     <motion.div
@@ -256,7 +256,7 @@ function ProductCard({
     >
       <div
         className="glass-surface relative flex h-full flex-col overflow-hidden rounded-[26px] p-5"
-        style={{ "--glass-tint": category.glow, ...glow.tiltStyle } as unknown as React.CSSProperties}
+        style={{ "--glass-tint": category.glow } as React.CSSProperties}
         {...glow.handlers}
       >
         {/* Cursor-following spotlight */}

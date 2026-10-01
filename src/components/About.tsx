@@ -9,10 +9,10 @@ import Reveal from "@/components/ui/Reveal";
 import ImageReveal from "@/components/ui/ImageReveal";
 
 /** The platform's headline numbers (same figures shown in the hero). */
-const stats: { value: string; label: string; tone: GlassTone; depth: number }[] = [
-  { value: "2,400+", label: "Licensed Vets", tone: "teal", depth: 0.55 },
-  { value: "98%", label: "Satisfaction", tone: "cyan", depth: 0.75 },
-  { value: "24/7", label: "Availability", tone: "coral", depth: 0.95 },
+const stats: { value: string; label: string; tone: GlassTone }[] = [
+  { value: "2,400+", label: "Licensed Vets", tone: "teal" },
+  { value: "98%", label: "Satisfaction", tone: "cyan" },
+  { value: "24/7", label: "Availability", tone: "coral" },
 ];
 
 /** Accreditation badges (previously shown in the footer). */
@@ -30,9 +30,8 @@ const certifications = [
  * narrative, its accreditations, the platform's real numbers and the final
  * call to action into a single frosted band.
  *
- * The statistics become floating glass panels at three different depths
- * (2,400+ / 98% / 24/7), and the companion illustration anchors the left side
- * — the last object the visitor passes before the footer.
+ * The statistics become glass panels (2,400+ / 98% / 24/7), and the
+ * companion illustration anchors the left side.
  */
 export default function About() {
   return (
@@ -40,16 +39,13 @@ export default function About() {
       id="about"
       label="About"
       eyebrow="Scene 07"
-      tone="violet"
-      intensity={0.8}
-      camera={1.4}
       aliases={["blog", "careers", "partner"]}
       className="w-full px-6 py-24 lg:py-28"
     >
       <div className="relative mx-auto max-w-7xl">
         {/* ── The settled final band ── */}
         <div
-          data-depth="0.28"
+
           className="glass-surface relative overflow-hidden rounded-[36px] p-6 sm:rounded-[44px] sm:p-10 lg:p-14"
           style={{ "--glass-tint": "0,172,193" } as React.CSSProperties}
         >
@@ -73,8 +69,8 @@ export default function About() {
 
           <div className="relative grid grid-cols-1 items-center gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
             {/* ══════════ LEFT · the companion ══════════ */}
-            <div data-depth="0.42" className="relative">
-              <div className="relative" style={{ perspective: "1200px" }}>
+            <div className="relative">
+              <div className="relative">
                 <ImageReveal
                   src="/cat.png"
                   alt="A happy cat at the PawCare clinic"
@@ -89,7 +85,6 @@ export default function About() {
                     label="Healthy Pets"
                     detail="Happy Lives"
                     tone="teal"
-                    depth={1.15}
                     delay={0.2}
                     className="absolute -left-3 bottom-[16%] sm:-left-6"
                   />
@@ -98,7 +93,6 @@ export default function About() {
                     label="Because they"
                     detail="matter"
                     tone="cyan"
-                    depth={1.3}
                     delay={0.35}
                     className="absolute -right-3 top-[10%] sm:-right-6"
                   />
@@ -107,7 +101,7 @@ export default function About() {
             </div>
 
             {/* ══════════ RIGHT · narrative, proof, closing action ══════════ */}
-            <div data-depth="0.3" className="relative">
+            <div className="relative">
               <Reveal>
                 <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#00ACC1]">
                   About PawCare
@@ -155,7 +149,7 @@ export default function About() {
             </div>
           </div>
 
-          {/* ══════════ Floating statistics — three depth planes ══════════ */}
+          {/* ══════════ Key statistics ══════════ */}
           <div className="relative mt-12 lg:mt-16">
             <Reveal>
               <p className="text-center text-[11px] font-semibold uppercase tracking-[0.32em] text-[#00ACC1]">
@@ -168,7 +162,6 @@ export default function About() {
                 <Reveal key={stat.label} delay={0.08 * index} y={26}>
                   <GlassSurface
                     tone={stat.tone}
-                    depth={stat.depth}
                     radius="rounded-3xl"
                     padding="px-6 py-6"
                     className={index === 1 ? "sm:mt-6" : index === 2 ? "sm:mt-12" : ""}

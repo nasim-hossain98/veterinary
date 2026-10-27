@@ -1,6 +1,5 @@
 import Hero from "@/components/Hero";
 import ServiceBento from "@/components/ServiceBento";
-import FindAndLocate from "@/components/FindAndLocate";
 import VetPharmacy from "@/components/VetPharmacy";
 import ExpertiseCarousel from "@/components/ExpertiseCarousel";
 import Journey from "@/components/Journey";
@@ -23,7 +22,6 @@ export default function Home() {
 
           <ServiceBento />
           <Journey />
-          <FindAndLocate />
           <VetPharmacy />
           <ExpertiseCarousel />
           <About />

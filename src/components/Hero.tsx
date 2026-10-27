@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 
 import Image from "next/image";
@@ -75,6 +76,8 @@ function animateCounter(el: HTMLElement, end: number, suffix: string, delay: num
  * final, fully-visible state.
  */
 export default function Hero() {
+  const router = useRouter();
+  const [heroSearch, setHeroSearch] = useState("");
   const sectionRef = useRef<HTMLElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const badgeRef = useRef<HTMLDivElement>(null);
@@ -272,22 +275,35 @@ export default function Hero() {
 
             {/* Search bar */}
             <div ref={searchRef} className="mt-8 w-full max-w-md">
-              <div className="flex items-center rounded-full border border-white/70 bg-white/80 shadow-[0_18px_44px_-26px_rgba(0,77,64,0.55)] backdrop-blur-md transition-shadow duration-300 hover:shadow-[0_0_0_3px_rgba(0,172,193,0.15),0_18px_44px_-26px_rgba(0,77,64,0.55)]">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const q = heroSearch.trim();
+                  if (q) {
+                    router.push(`/find-doctor?q=${encodeURIComponent(q)}`);
+                  } else {
+                    router.push("/find-doctor");
+                  }
+                }}
+                className="flex items-center rounded-full border border-white/70 bg-white/80 shadow-[0_18px_44px_-26px_rgba(0,77,64,0.55)] backdrop-blur-md transition-shadow duration-300 hover:shadow-[0_0_0_3px_rgba(0,172,193,0.15),0_18px_44px_-26px_rgba(0,77,64,0.55)]"
+              >
                 <input
                   type="text"
+                  value={heroSearch}
+                  onChange={(e) => setHeroSearch(e.target.value)}
                   placeholder="Emergency Vet Near Me…"
                   aria-label="Search for a vet or service"
                   className="flex-1 bg-transparent px-5 py-4 text-sm text-[#004D40] outline-none placeholder:text-[#90A4AE]"
                 />
                 <button
-                  type="button"
+                  type="submit"
                   aria-label="Search"
                   className="mr-1.5 flex h-10 w-10 items-center justify-center rounded-full bg-[#00ACC1] text-white transition-all hover:scale-105 hover:bg-[#0097A7] active:scale-95"
                   style={{ boxShadow: "0 4px 18px rgba(0,172,193,0.4)" }}
                 >
                   <Search className="h-4 w-4" />
                 </button>
-              </div>
+              </form>
             </div>
 
             {/* CTA buttons */}

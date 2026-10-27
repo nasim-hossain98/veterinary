@@ -390,7 +390,7 @@ export default function Footer() {
                 </div>
               </div>
 
-              <p className="flex items-center gap-1.5 text-xs text-[#546E7A]">
+              <p suppressHydrationWarning className="flex items-center gap-1.5 text-xs text-[#546E7A]">
                 &copy; {new Date().getFullYear()} PawCare. Made with
                 <Heart className="h-3.5 w-3.5 fill-[#FF8A80] text-[#FF8A80] animate-pulse" />
                 for pets
